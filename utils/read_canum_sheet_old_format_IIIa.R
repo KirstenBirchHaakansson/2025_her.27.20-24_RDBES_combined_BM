@@ -81,6 +81,7 @@ read_canum_sheet_old_format_IIIa <- function(file, sheet_name) {
   }
   
   canum_head <- cbind(canum, head_done)
+  canum_head$canum <- as.numeric(canum_head$canum)
   
   return(canum_head)
   

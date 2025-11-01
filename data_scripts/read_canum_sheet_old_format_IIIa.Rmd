@@ -18,8 +18,10 @@ path_in <- "./boot/data/historical_data/sc_sheets_old_format/"
 ```
 
 # 2000
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r, eval = F}
 file <- "HER-IIIa-2005_ok.xls" 
 # Fleet E and not fleet D is used - 
@@ -80,8 +82,10 @@ summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2001
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r, eval = F}
 file <- "HER-IIIa-2005_ok.xls" 
 # Fleet E and not fleet D is used - 
@@ -142,8 +146,10 @@ summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2002
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r, eval = F}
 file <- "HER-IIIa-2005_ok.xls" 
 # Fleet E and not fleet D is used - 
@@ -204,8 +210,10 @@ summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2003
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r, eval = F}
 file <- "HER-IIIa-2005_ok.xls" 
 # Fleet E and not fleet D is used - 
@@ -266,8 +274,10 @@ summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2004
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r, eval = F}
 file <- "HER-IIIa-2005_ok.xls" 
 # Fleet E and not fleet D is used - 
@@ -328,8 +338,10 @@ summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2005
-Preliminary check against Thomas figures and current time series: Y
-Imputations checked against report and spread sheet: Y
+Total CATON and CANUM checked against Thomas figures: ok
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet: ok
 ```{r}
 file <- "HER-IIIa-2005_ok.xls" 
 # Fleet E and not fleet D is used - 
@@ -390,14 +402,16 @@ summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2006
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: CANUM ok, but CATON too high in and it looks like Kattegat and Skagerrak are swapped
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet: ok
 ```{r}
 file <- "HER-IIIa-2006.xls" 
 
 sheet_names <- excel_sheets(path = paste0(path_in, file))
 
-SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") # No imputations
+SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") 
 sum(unique(SD20SE$catch_t))
 SD20SE$imputation <- NA
 SD20SE$imputation[SD20SE$quarter == 1 & SD20SE$fleet == "D"] <- "SE, C, Q1, 20"
@@ -437,10 +451,12 @@ summarise(group_by(subset(c06, wr == "8+"), year, division), ton = sum(catch_t, 
 summarise(group_by(c06, year, division), canum = sum(canum, na.rm = T))
 
 ```
-# 2007
 
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+# 2007
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2007new.xls"
 
@@ -501,8 +517,10 @@ summarise(group_by(c07, year, division), canum = sum(canum, na.rm = T))
 
 
 # 2008
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2008new.xls"
 
@@ -564,8 +582,10 @@ summarise(group_by(c08, year, division), canum = sum(canum, na.rm = T))
 
 
 # 2009
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2009.xls"
 
@@ -631,8 +651,10 @@ summarise(group_by(c09, year, division), canum = sum(canum, na.rm = T))
 
 
 # 2010
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2010.xls"
 
@@ -688,8 +710,10 @@ summarise(group_by(c10, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2011
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2011.xls"
 
@@ -736,8 +760,10 @@ summarise(group_by(c11, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2012
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2012.xls"
 
@@ -785,8 +811,10 @@ summarise(group_by(c12, year), canum = sum(canum, na.rm = T))
 ```
 
 # 2013
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2013.xls"
 
@@ -836,8 +864,10 @@ summarise(group_by(c13, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2014
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2014.xls"
 
@@ -891,8 +921,10 @@ summarise(group_by(c14, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2015
-Preliminary check against Thomas figures and current time series: N
-Imputations checked against report and spread sheet: N
+Total CATON and CANUM checked against Thomas figures: 
+Total CATON and CANUM checked against report:
+Total CATON and CANUM checked against spread sheet: 
+Imputations checked against spread sheet: 
 ```{r}
 file <- "HER-IIIa-2015.xls"
 

@@ -146,12 +146,12 @@ summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2002
-Total CATON and CANUM checked against Thomas figures: 
-Total CATON and CANUM checked against report:
-Total CATON and CANUM checked against spread sheet: 
-Imputations checked against spread sheet: and report if unclear 
+Total CATON and CANUM checked against Thomas figures: ok
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
 ```{r, eval = F}
-file <- "HER-IIIa-2005_ok.xls" 
+file <- "HER-IIIa-2002-with revised Swedish data.xls" 
 # Fleet E and not fleet D is used - 
 #  in the summary and report it looks like E become D, so this will be corrected in the end
 
@@ -160,62 +160,47 @@ sheet_names <- excel_sheets(path = paste0(path_in, file))
 SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") 
 sum(unique(SD20SE$catch_t))
 SD20SE$imputation <- NA
+SD20SE$imputation[SD20SE$quarter == 2 & SD20SE$fleet == "E"] <- "DK, E, Q2, 20"
 SD20SE$imputation[SD20SE$quarter == 3 & SD20SE$fleet == "E"] <- "DK, E, Q3, 20"
+SD20SE$imputation[SD20SE$quarter == 4 & SD20SE$fleet == "E"] <- "DK, E, Q4, 20"
 
 SD20DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-DK")
 sum(unique(SD20DK$catch_t))
 SD20DK$imputation <- NA
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "C"] <- "SE, C, Q1, 20"
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SE, C, Q2, 20"
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "E"] <- "SE, E, Q1, 20"
-
-SD20DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH")
-sum(unique(SD20DE$catch_t))
-SD20DE$imputation <- NA
-SD20DE$imputation[SD20DE$quarter == 3 & SD20DE$fleet == "C"] <- "DK, C, Q3, 20"
-SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DK, C, Q4, 20"
-
-SD20FO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH (2)")
-sum(unique(SD20FO$catch_t))
-SD20FO$imputation <- NA
-SD20FO$imputation[SD20FO$quarter == 3 & SD20FO$fleet == "E"] <- "DK, E, Q3, 20"
-SD20FO$imputation[SD20FO$quarter == 4 & SD20FO$fleet == "E"] <- "DK, E, Q4, 20"
 
 SD21SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-SE")
 sum(unique(SD21SE$catch_t))
 SD21SE$imputation <- NA
 SD21SE$imputation <- NA
-SD21SE$imputation[SD21SE$quarter == 1 & SD21SE$fleet == "E"] <- "DK, C, Q1, 21"
-SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "E"] <- "DK, C, Q2, 21"
-SD21SE$imputation[SD21SE$quarter == 4 & SD21SE$fleet == "E"] <- "DK, C, Q3, 21"
+SD21SE$imputation[SD21SE$quarter == 1 & SD21SE$fleet == "E"] <- "DK, E, Q1, 21"
+SD21SE$imputation[SD21SE$quarter == 4 & SD21SE$fleet == "E"] <- "DK, E, Q3, 21"
 
 SD21DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-DK")
 sum(unique(SD21DK$catch_t))
 SD21DK$imputation <- NA
 SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SE, C, Q2, 21"
-SD21DK$imputation[SD21DK$quarter == 3 & SD21DK$fleet == "C"] <- "SE, C, Q3, 21"
 
 
-c05 <- bind_rows(SD20DE, SD20DK, SD20FO, SD20SE, SD21DK, SD21SE)
+c02 <- bind_rows(SD20DE, SD20DK, SD20SE, SD21DK, SD21SE)
 
 # Rename fleet E to D
-c05 <- subset(c05, fleet != "D")
-c05$fleet[c05$fleet == "E"] <- "D"
+c02 <- subset(c02, fleet != "D")
+c02$fleet[c02$fleet == "E"] <- "D"
 
-rm(SD20DE, SD20DK, SD20FO, SD20SE, SD21DK, SD21SE)
+rm(SD20DE, SD20DK, SD20SE, SD21DK, SD21SE)
 
-summarise(group_by(subset(c05, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
-summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
+summarise(group_by(subset(c02, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c02, year, division), canum = sum(canum, na.rm = T))
 
 ```
 
 # 2003
-Total CATON and CANUM checked against Thomas figures: 
-Total CATON and CANUM checked against report:
-Total CATON and CANUM checked against spread sheet: 
-Imputations checked against spread sheet: and report if unclear 
+Total CATON and CANUM checked against Thomas figures: CANUM ok. CATON differs
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok - an error in the spread sheet has been corrected for SD21DK
+Imputations checked against spread sheet and report if unclear: ok
 ```{r, eval = F}
-file <- "HER-IIIa-2005_ok.xls" 
+file <- "HER-IIIa-2003 revised 110304.xls" 
 # Fleet E and not fleet D is used - 
 #  in the summary and report it looks like E become D, so this will be corrected in the end
 
@@ -224,14 +209,14 @@ sheet_names <- excel_sheets(path = paste0(path_in, file))
 SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") 
 sum(unique(SD20SE$catch_t))
 SD20SE$imputation <- NA
-SD20SE$imputation[SD20SE$quarter == 3 & SD20SE$fleet == "E"] <- "DK, E, Q3, 20"
+SD20SE$imputation[SD20SE$quarter == 2 & SD20SE$fleet == "E"] <- "DK, C, Q2, 20"
+SD20SE$imputation[SD20SE$quarter == 3 & SD20SE$fleet == "E"] <- "DK, C, Q3, 20"
 
 SD20DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-DK")
 sum(unique(SD20DK$catch_t))
 SD20DK$imputation <- NA
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "C"] <- "SE, C, Q1, 20"
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SE, C, Q2, 20"
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "E"] <- "SE, E, Q1, 20"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "DK, C, Q1, 20"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "E"] <- "DK, E, Q1, 20"
 
 SD20DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH")
 sum(unique(SD20DE$catch_t))
@@ -239,101 +224,85 @@ SD20DE$imputation <- NA
 SD20DE$imputation[SD20DE$quarter == 3 & SD20DE$fleet == "C"] <- "DK, C, Q3, 20"
 SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DK, C, Q4, 20"
 
-SD20FO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH (2)")
-sum(unique(SD20FO$catch_t))
-SD20FO$imputation <- NA
-SD20FO$imputation[SD20FO$quarter == 3 & SD20FO$fleet == "E"] <- "DK, E, Q3, 20"
-SD20FO$imputation[SD20FO$quarter == 4 & SD20FO$fleet == "E"] <- "DK, E, Q4, 20"
-
 SD21SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-SE")
 sum(unique(SD21SE$catch_t))
 SD21SE$imputation <- NA
 SD21SE$imputation <- NA
 SD21SE$imputation[SD21SE$quarter == 1 & SD21SE$fleet == "E"] <- "DK, C, Q1, 21"
-SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "E"] <- "DK, C, Q2, 21"
-SD21SE$imputation[SD21SE$quarter == 4 & SD21SE$fleet == "E"] <- "DK, C, Q3, 21"
+SD21SE$imputation[SD21SE$quarter == 2 & SD21SE$fleet == "E"] <- "DK, C, Q2, 21"
+SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "C"] <- "DK, E, Q3, 21"
 
 SD21DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-DK")
 sum(unique(SD21DK$catch_t))
 SD21DK$imputation <- NA
-SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SE, C, Q2, 21"
-SD21DK$imputation[SD21DK$quarter == 3 & SD21DK$fleet == "C"] <- "SE, C, Q3, 21"
 
-
-c05 <- bind_rows(SD20DE, SD20DK, SD20FO, SD20SE, SD21DK, SD21SE)
+c03 <- bind_rows(SD20DE, SD20DK, SD20SE, SD21DK, SD21SE)
 
 # Rename fleet E to D
-c05 <- subset(c05, fleet != "D")
-c05$fleet[c05$fleet == "E"] <- "D"
+c03 <- subset(c03, fleet != "D")
+c03$fleet[c03$fleet == "E"] <- "D"
 
-rm(SD20DE, SD20DK, SD20FO, SD20SE, SD21DK, SD21SE)
+rm(SD20DE, SD20DK, SD20SE, SD21DK, SD21SE)
 
-summarise(group_by(subset(c05, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
-summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
+summarise(group_by(subset(c03, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c03, year, division), canum = sum(canum, na.rm = T))
 
 ```
 
 # 2004
-Total CATON and CANUM checked against Thomas figures: 
-Total CATON and CANUM checked against report:
-Total CATON and CANUM checked against spread sheet: 
-Imputations checked against spread sheet: and report if unclear 
+Total CATON and CANUM checked against Thomas figures: ok
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok - an error in the spread sheet has been corrected for SD21DK
+Imputations checked against spread sheet and report if unclear: ok
 ```{r, eval = F}
-file <- "HER-IIIa-2005_ok.xls" 
+file <- "HER-IIIa-2004.xls" 
 # Fleet E and not fleet D is used - 
 #  in the summary and report it looks like E become D, so this will be corrected in the end
 
 sheet_names <- excel_sheets(path = paste0(path_in, file))
 
+SD20NO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-NO")
+sum(unique(SD20NO$catch_t))
+SD20NO$imputation <- NA
+SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "DK, C, Q1, 20"
+SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "DK, C, Q3, 20"
+SD20NO$imputation[SD20NO$quarter == 4 & SD20NO$fleet == "C"] <- "DK, C, Q3, 20"
+
 SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") 
 sum(unique(SD20SE$catch_t))
 SD20SE$imputation <- NA
-SD20SE$imputation[SD20SE$quarter == 3 & SD20SE$fleet == "E"] <- "DK, E, Q3, 20"
+SD20SE$imputation[SD20SE$quarter == 2 & SD20SE$fleet == "C"] <- "DK, C, Q2, 4ae"
+SD20SE$imputation[SD20SE$quarter == 3 & SD20SE$fleet == "C"] <- "DK, C, Q3, 20"
 
 SD20DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-DK")
 sum(unique(SD20DK$catch_t))
 SD20DK$imputation <- NA
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "C"] <- "SE, C, Q1, 20"
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SE, C, Q2, 20"
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "E"] <- "SE, E, Q1, 20"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "DK, C, Q2, 4ae"
 
 SD20DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH")
 sum(unique(SD20DE$catch_t))
 SD20DE$imputation <- NA
 SD20DE$imputation[SD20DE$quarter == 3 & SD20DE$fleet == "C"] <- "DK, C, Q3, 20"
-SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DK, C, Q4, 20"
-
-SD20FO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH (2)")
-sum(unique(SD20FO$catch_t))
-SD20FO$imputation <- NA
-SD20FO$imputation[SD20FO$quarter == 3 & SD20FO$fleet == "E"] <- "DK, E, Q3, 20"
-SD20FO$imputation[SD20FO$quarter == 4 & SD20FO$fleet == "E"] <- "DK, E, Q4, 20"
 
 SD21SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-SE")
 sum(unique(SD21SE$catch_t))
 SD21SE$imputation <- NA
-SD21SE$imputation <- NA
-SD21SE$imputation[SD21SE$quarter == 1 & SD21SE$fleet == "E"] <- "DK, C, Q1, 21"
-SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "E"] <- "DK, C, Q2, 21"
-SD21SE$imputation[SD21SE$quarter == 4 & SD21SE$fleet == "E"] <- "DK, C, Q3, 21"
+SD21SE$imputation[SD21SE$quarter == 4 & SD21SE$fleet == "E"] <- "DK, E, Q4, 21"
 
 SD21DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-DK")
 sum(unique(SD21DK$catch_t))
 SD21DK$imputation <- NA
-SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SE, C, Q2, 21"
-SD21DK$imputation[SD21DK$quarter == 3 & SD21DK$fleet == "C"] <- "SE, C, Q3, 21"
 
-
-c05 <- bind_rows(SD20DE, SD20DK, SD20FO, SD20SE, SD21DK, SD21SE)
+c04 <- bind_rows(SD20NO, SD20DE, SD20DK, SD20SE, SD21DK, SD21SE)
 
 # Rename fleet E to D
-c05 <- subset(c05, fleet != "D")
-c05$fleet[c05$fleet == "E"] <- "D"
+c04 <- subset(c04, fleet != "D")
+c04$fleet[c04$fleet == "E"] <- "D"
 
-rm(SD20DE, SD20DK, SD20FO, SD20SE, SD21DK, SD21SE)
+rm(SD20NO, SD20DE, SD20DK, SD20SE, SD21DK, SD21SE)
 
-summarise(group_by(subset(c05, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
-summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
+summarise(group_by(subset(c04, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c04, year, division), canum = sum(canum, na.rm = T))
 
 ```
 
@@ -766,17 +735,21 @@ summarise(group_by(c11, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2012
-Total CATON and CANUM checked against Thomas figures: 
-Total CATON and CANUM checked against report:
-Total CATON and CANUM checked against spread sheet: 
-Imputations checked against spread sheet: and report if unclear 
+Total CATON and CANUM checked against Thomas figures: ok
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
 ```{r}
 file <- "HER-IIIa-2012.xls"
 
 sheet_names <- excel_sheets(path = paste0(path_in, file))
 
-SD20NO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-NO") # No imputations
+SD20NO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-NO")
 sum(unique(SD20NO$catch_t))
+SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "SE, C, Q1, 20"
+SD20NO$imputation[SD20NO$quarter == 2 & SD20NO$fleet == "C"] <- "SE, C, Q2, 20"
+SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "DK, C, Q3, 20"
+SD20NO$imputation[SD20NO$quarter == 4 & SD20NO$fleet == "C"] <- "DK, C, Q4, 20"
 
 SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") # No imputations
 sum(unique(SD20SE$catch_t))
@@ -784,43 +757,45 @@ sum(unique(SD20SE$catch_t))
 SD20DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-DK")
 sum(unique(SD20DK$catch_t))
 SD20DK$imputation <- NA
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "C"] <- "SWE_IIIaN_Q1"
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SWE_IIIaN_Q2"
+SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "C"] <- "SE, C, Q1, 20"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SE, C, Q2, 20"
+SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "D"] <- "DK, D, Q1, 21"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "D"] <- "DK, D, Q2, 21"
 
 SD20DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH")
 sum(unique(SD20DE$catch_t))
 SD20DE$imputation <- NA
-SD20DE$imputation[SD20DE$quarter == 3 & SD20DE$fleet == "C"] <- "DEN_IIIaN_Q3"
-SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DEN_IIIaN_Q4"
+SD20DE$imputation[SD20DE$quarter == 3 & SD20DE$fleet == "C"] <- "DK, C, Q3, 20"
+SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DK, C, Q4, 20"
 
 SD21SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-SE")
 sum(unique(SD21SE$catch_t))
 SD21SE$imputation <- NA
-SD21SE$imputation[SD21SE$quarter == 2 & SD21SE$fleet == "C"] <- "SWE_IIIaS_Q1"
-SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "C"] <- "SWE_IIIaN_Q3"
-SD21SE$imputation[SD21SE$quarter == 4 & SD21SE$fleet == "C"] <- "SWE_IIIaN_Q4"
+SD21SE$imputation[SD21SE$quarter == 2 & SD21SE$fleet == "C"] <- "SE, C, Q1, 21"
+SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "C"] <- "SE, C, Q3, 20"
+SD21SE$imputation[SD21SE$quarter == 4 & SD21SE$fleet == "C"] <- "SE, C, Q4, 20"
 
 SD21DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-DK")
 sum(unique(SD21DK$catch_t))
 SD21DK$imputation <- NA
-SD21DK$imputation[SD21DK$quarter == 1 & SD21DK$fleet == "C"] <- "SWE_IIIaS_Q1"
-SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SWE_IIIaS_Q1"
+SD21DK$imputation[SD21DK$quarter == 1 & SD21DK$fleet == "C"] <- "SE, C, Q1, 21"
+SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SE, C, Q1, 21"
 
 c12 <- bind_rows(SD20DE, SD20DK, SD20NO, SD20SE, SD21DK, SD21SE)
 
 rm(SD20DE, SD20DK, SD20NO, SD20SE, SD21DK, SD21SE)
 
 summarise(group_by(subset(c12, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
-summarise(group_by(c12, year), canum = sum(canum, na.rm = T))
+summarise(group_by(c12, year, division), canum = sum(canum, na.rm = T))
 
 # Preliminary check against Thomas figures and current time series ok
 ```
 
 # 2013
-Total CATON and CANUM checked against Thomas figures: 
-Total CATON and CANUM checked against report:
-Total CATON and CANUM checked against spread sheet: 
-Imputations checked against spread sheet: and report if unclear 
+Total CATON and CANUM checked against Thomas figures: CANUM ok. CATON not ok
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
 ```{r}
 file <- "HER-IIIa-2013.xls"
 
@@ -828,9 +803,9 @@ sheet_names <- excel_sheets(path = paste0(path_in, file))
 
 SD20NO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-NO")
 sum(unique(SD20NO$catch_t))
-SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "SWE_IIIaN_Q1"
-SD20NO$imputation[SD20NO$quarter == 2 & SD20NO$fleet == "C"] <- "SWE_IIIaN_Q2"
-SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "NO_IIIaN_Q4"
+SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "SE, C, Q1, 20"
+SD20NO$imputation[SD20NO$quarter == 2 & SD20NO$fleet == "C"] <- "SE, C, Q2, 20"
+SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "NO, C, Q4, 20"
 
 SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") # No imputations
 sum(unique(SD20SE$catch_t))
@@ -838,26 +813,33 @@ sum(unique(SD20SE$catch_t))
 SD20DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-DK")
 sum(unique(SD20DK$catch_t))
 SD20DK$imputation <- NA
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "C"] <- "SWE_IIIaN_Q1"
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SWE_IIIaN_Q2"
+SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "C"] <- "SE, C, Q1, 20"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SE, C, Q1, 20"
+SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "D"] <- "DK, D, Q1, 21"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "D"] <- "DK, D, Q2, 21"
+SD20DK$imputation[SD20DK$quarter == 4 & SD20DK$fleet == "D"] <- "DK, D, Q3, 20"
 
 SD20DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH")
 sum(unique(SD20DE$catch_t))
 SD20DE$imputation <- NA
-SD20DE$imputation[SD20DE$quarter == 3 & SD20DE$fleet == "C"] <- "DEN_IIIaN_Q3"
-SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DEN_IIIaN_Q4"
+SD20DE$imputation[SD20DE$quarter == 3 & SD20DE$fleet == "C"] <- "DK, C, Q3, 20"
+SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DK, C, Q3, 20"
 
 SD21SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-SE")
 sum(unique(SD21SE$catch_t))
 SD21SE$imputation <- NA
-SD21SE$imputation[SD21SE$quarter == 2 & SD21SE$fleet == "C"] <- "SWE_IIIaS_Q1"
-SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "C"] <- "SWE_IIIaS_Q4"
+SD21SE$imputation[SD21SE$quarter == 2 & SD21SE$fleet == "C"] <- "SE, C, Q1, 21"
+SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "C"] <- "SE, C, Q4, 21"
 
 SD21DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-DK")
 sum(unique(SD21DK$catch_t))
 SD21DK$imputation <- NA
-SD21DK$imputation[SD21DK$quarter == 1 & SD21DK$fleet == "C"] <- "SWE_IIIaS_Q1"
-SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SWE_IIIaS_Q1"
+SD21DK$imputation[SD21DK$quarter == 1 & SD21DK$fleet == "C"] <- "SE, C, Q1, 21"
+SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SE, C, Q1, 21"
+SD21DK$imputation[SD21DK$quarter == 3 & SD21DK$fleet == "C"] <- "DK, C, Q3, 20"
+SD21DK$imputation[SD21DK$quarter == 4 & SD21DK$fleet == "C"] <- "DK, C, Q4, 20"
+SD21DK$imputation[SD21DK$quarter == 3 & SD21DK$fleet == "D"] <- "DK, D, Q3, 20"
+SD21DK$imputation[SD21DK$quarter == 4 & SD21DK$fleet == "D"] <- "DK, D, Q3, 20"
 
 c13 <- bind_rows(SD20DE, SD20DK, SD20NO, SD20SE, SD21DK, SD21SE)
 
@@ -870,10 +852,10 @@ summarise(group_by(c13, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2014
-Total CATON and CANUM checked against Thomas figures: 
-Total CATON and CANUM checked against report:
-Total CATON and CANUM checked against spread sheet: 
-Imputations checked against spread sheet: and report if unclear 
+Total CATON and CANUM checked against Thomas figures: CANUM ok. CATON not the same
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
 ```{r}
 file <- "HER-IIIa-2014.xls"
 
@@ -881,9 +863,9 @@ sheet_names <- excel_sheets(path = paste0(path_in, file))
 
 SD20NO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-NO")
 sum(unique(SD20NO$catch_t))
-SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "NO_IIIaN_Q2"
-SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "DEN_Q3_20"
-SD20NO$imputation[SD20NO$quarter == 4 & SD20NO$fleet == "C"] <- "DEN_Q4_20"
+SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "NO, C, Q2, 20"
+SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "DK, C, Q3, 20"
+SD20NO$imputation[SD20NO$quarter == 4 & SD20NO$fleet == "C"] <- "DK, C, Q3, 20"
 
 SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") # No imputations
 sum(unique(SD20SE$catch_t))
@@ -891,19 +873,19 @@ sum(unique(SD20SE$catch_t))
 SD20DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-DK")
 sum(unique(SD20DK$catch_t))
 SD20DK$imputation <- NA
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "DEN_Q1_20"
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "D"] <- "DEN_Q2_21"
-SD20DK$imputation[SD20DK$quarter == 4 & SD20DK$fleet == "D"] <- "DEN_Q3_20"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "DK, C, Q1, 21"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "D"] <- "DK, D, Q2, 21"
+SD20DK$imputation[SD20DK$quarter == 4 & SD20DK$fleet == "D"] <- "DK, D, Q3, 20"
 
 SD20DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH")
 sum(unique(SD20DE$catch_t))
 SD20DE$imputation <- NA
-SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DEN_IIIaN_Q4"
+SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "DK, C, Q4, 20"
 
 SD20FO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH (2)")
 sum(unique(SD20FO$catch_t))
 SD20FO$imputation <- NA
-SD20FO$imputation[SD20FO$quarter == 3 & SD20FO$fleet == "C"] <- "DEN_Q3_Fleet C"
+SD20FO$imputation[SD20FO$quarter == 3 & SD20FO$fleet == "C"] <- "DK, C, Q3, 20"
 
 SD21SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-SE")
 sum(unique(SD21SE$catch_t))
@@ -912,9 +894,9 @@ SD21SE$imputation <- NA # No imputations
 SD21DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-DK")
 sum(unique(SD21DK$catch_t))
 SD21DK$imputation <- NA
-SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "DNK_IIIaS_Q1"
-SD21DK$imputation[SD21DK$quarter == 3 & SD21DK$fleet == "C"] <- "DNK_IIIaN_Q3"
-SD21DK$imputation[SD21DK$quarter == 4 & SD21DK$fleet == "C"] <- "DNK_IIIaN_Q4"
+SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "DK, C, Q1, 21"
+SD21DK$imputation[SD21DK$quarter == 3 & SD21DK$fleet == "C"] <- "DK, C, Q3, 20"
+SD21DK$imputation[SD21DK$quarter == 4 & SD21DK$fleet == "C"] <- "DK, C, Q3, 20"
 
 c14 <- bind_rows(SD20DE, SD20DK, SD20NO, SD20SE, SD20FO, SD21DK, SD21SE)
 
@@ -927,10 +909,10 @@ summarise(group_by(c14, year, division), canum = sum(canum, na.rm = T))
 ```
 
 # 2015
-Total CATON and CANUM checked against Thomas figures: 
-Total CATON and CANUM checked against report:
-Total CATON and CANUM checked against spread sheet: 
-Imputations checked against spread sheet: and report if unclear 
+Total CATON and CANUM checked against Thomas figures: CANUM ok. CATON not the same
+Total CATON and CANUM checked against report: ok
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
 ```{r}
 file <- "HER-IIIa-2015.xls"
 
@@ -939,47 +921,48 @@ sheet_names <- excel_sheets(path = paste0(path_in, file))
 SD20NO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-NO")
 sum(unique(SD20NO$catch_t))
 SD20NO$imputation <- NA
-SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "SWE_20_Q1"
-SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "SWE_20_Q1"
-SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "DEN_20_C_Q3"
-SD20NO$imputation[SD20NO$quarter == 4 & SD20NO$fleet == "C"] <- "SWE_20_Q4"
+SD20NO$imputation[SD20NO$quarter == 1 & SD20NO$fleet == "C"] <- "SE, C, Q1, 20"
+SD20NO$imputation[SD20NO$quarter == 2 & SD20NO$fleet == "C"] <- "SE, C, Q1, 20"
+SD20NO$imputation[SD20NO$quarter == 3 & SD20NO$fleet == "C"] <- "DK, C, Q3, 20"
+SD20NO$imputation[SD20NO$quarter == 4 & SD20NO$fleet == "C"] <- "SE, C, Q4, 20"
 
 SD20SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-SE") # No imputations
 sum(unique(SD20SE$catch_t))
 SD20SE$imputation <- NA
-SD20SE$imputation[SD20SE$quarter == 2 & SD20SE$fleet == "C"] <- "SWE_20_Q1"
+SD20SE$imputation[SD20SE$quarter == 2 & SD20SE$fleet == "C"] <- "SE, C, Q1, 20"
 
 SD20DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-DK")
 sum(unique(SD20DK$catch_t))
 SD20DK$imputation <- NA
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SWE_C_20_Q2"
-SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "D"] <- "D_21_DK_Q1"
-SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "D"] <- "D_21_DK_Q2"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "C"] <- "SE, C, Q1, 20"
+SD20DK$imputation[SD20DK$quarter == 1 & SD20DK$fleet == "D"] <- "DK, D, Q1, 21"
+SD20DK$imputation[SD20DK$quarter == 2 & SD20DK$fleet == "D"] <- "DK, D, Q2, 21"
 
 SD20DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH")
 sum(unique(SD20DE$catch_t))
 SD20DE$imputation <- NA
-SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "SWE_IIIaN_Q4"
+SD20DE$imputation[SD20DE$quarter == 4 & SD20DE$fleet == "C"] <- "SE, C, Q4, 20"
 
 SD20FO <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH (2)")
 sum(unique(SD20FO$catch_t))
 SD20FO$imputation <- NA
-SD20FO$imputation[SD20FO$quarter == 1 & SD20FO$fleet == "C"] <- "SWE_20_Q1"
+SD20FO$imputation[SD20FO$quarter == 1 & SD20FO$fleet == "C"] <- "SE, C, Q1, 20"
 
 SD20NL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD20-OTH (3)")
 sum(unique(SD20NL$catch_t))
 SD20NL$imputation <- NA
-SD20NL$imputation[SD20FO$quarter == 3 & SD20FO$fleet == "C"] <- "DEN_20_C_Q3"
+SD20NL$imputation[SD20NL$quarter == 3 & SD20NL$fleet == "C"] <- "DK, C, Q3, 20"
 
 SD21SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-SE")
 sum(unique(SD21SE$catch_t))
-SD21SE$imputation <- NA # No imputations
+SD21SE$imputation <- NA 
+SD21SE$imputation[SD21SE$quarter == 3 & SD21SE$fleet == "C"] <- "SE, C, Q4, 21"
 
 SD21DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "SD21-DK")
 sum(unique(SD21DK$catch_t))
 SD21DK$imputation <- NA
-SD21DK$imputation[SD21DK$quarter == 1 & SD21DK$fleet == "C"] <- "SWE_21_Q1"
-SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SWE_21_Q2"
+SD21DK$imputation[SD21DK$quarter == 1 & SD21DK$fleet == "C"] <- "SE, C, Q1, 21"
+SD21DK$imputation[SD21DK$quarter == 2 & SD21DK$fleet == "C"] <- "SE, C, Q2, 21"
 
 c15 <- bind_rows(SD20DE, SD20DK, SD20NO, SD20SE, SD20FO, SD20NL, SD21DK, SD21SE)
 

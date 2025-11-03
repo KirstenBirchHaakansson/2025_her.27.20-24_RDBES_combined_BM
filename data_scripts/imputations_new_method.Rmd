@@ -1,0 +1,292 @@
+---
+title: "imputation new method"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(readxl)
+library(dplyr)
+
+options(scipen = 999)
+
+
+path_boot <- "./boot/data/historical_data/sc_sheets_old_format/"
+path_data <- "./data/"
+```
+
+```{r}
+
+years <- c(2017:2024)
+dat_new <- c()
+
+for (i in years) {
+  
+  dat_0 <- read.csv(paste0("./boot/data/data_from_recent_years/C1_her2024_canum_without_imputations_", i, ".csv"))
+  dat_0 <- subset(dat_0, year == i)
+  dat_new <- bind_rows(dat_new, dat_0)
+  
+}
+
+sum(dat_new$canum * dat_new$weca, na.rm = T)
+```
+
+```{r}
+
+# Remove strata with no landings
+dat_new <- subset(dat_new, catch_t != 0)
+sum(dat_new$canum * dat_new$weca, na.rm = T)
+
+# add id
+dat_unique <- distinct(dat_new, ctry, year, area, fleet, quarter, subFleet)
+dat_unique$id <- row.names(dat_unique)
+dat_new <- left_join(dat_new, dat_unique)
+
+# Rename fleet
+dat_new$subFleet[is.na(dat_new$subFleet)] <- dat_new$fleet[is.na(dat_new$subFleet)]
+
+# Identify strata with biology
+
+dat_with_bio_0 <- subset(dat_new, !(is.na(weca)))
+
+dat_with_bio <- subset(dat_new, id %in% dat_with_bio_0$id)
+dat_without_bio <- subset(dat_new, !(id %in% dat_with_bio_0$id))
+
+dat_without_bio <- select(dat_without_bio, -weca)
+
+# Add stuff needed for defining levels ----
+## Time
+
+dat_without_bio$year_impu_v1 <- dat_without_bio$year
+dat_without_bio$quarter_impu_v1 <- dat_without_bio$quarter
+dat_without_bio$wr_impu_action_v1 <- NA
+
+dat_without_bio$year_impu_v1[dat_without_bio$quarter == 1] <- dat_without_bio$year[dat_without_bio$quarter == 1] - 1
+dat_without_bio$quarter_impu_v1[dat_without_bio$quarter == 1] <- 4
+dat_without_bio$wr_impu_action_v1[dat_without_bio$quarter == 1] <- "minus 1"
+dat_without_bio$quarter_impu_v1[dat_without_bio$quarter == 2] <- 3
+dat_without_bio$quarter_impu_v1[dat_without_bio$quarter == 3] <- 2
+dat_without_bio$year_impu_v1[dat_without_bio$quarter == 4] <- dat_without_bio$year[dat_without_bio$quarter == 4] + 1
+dat_without_bio$quarter_impu_v1[dat_without_bio$quarter == 4] <- 1
+dat_without_bio$wr_impu_action_v1[dat_without_bio$quarter == 4] <- "add 1"
+
+arrange(distinct(dat_without_bio, year, quarter, year_impu_v1, quarter_impu_v1), year, quarter)
+
+dat_without_bio$quarter_impu_v2 <- dat_without_bio$quarter
+
+dat_without_bio$quarter_impu_v2[dat_without_bio$quarter == 1] <- 2
+dat_without_bio$quarter_impu_v2[dat_without_bio$quarter == 2] <- 1
+dat_without_bio$quarter_impu_v2[dat_without_bio$quarter == 3] <- 4
+dat_without_bio$quarter_impu_v2[dat_without_bio$quarter == 4] <- 3
+
+arrange(distinct(dat_without_bio, year, quarter, year, quarter_impu_v2), year, quarter)
+
+
+## New area level
+dat_with_bio$area_impu[dat_with_bio$area %in% c("27.3.a.20", "27.3.a.21")] <- "20-21"
+dat_with_bio$area_impu[!(dat_with_bio$area %in% c("27.3.a.20", "27.3.a.21"))] <- "22-24"
+dat_without_bio$area_impu[dat_without_bio$area %in% c("27.3.a.20", "27.3.a.21")] <- "20-21"
+dat_without_bio$area_impu[!(dat_without_bio$area %in% c("27.3.a.20", "27.3.a.21"))] <- "22-24"
+
+distinct(dat_with_bio, area, area_impu)
+
+# Define levels
+## Level 1
+
+dat_with_bio$level_1 <- paste(
+  dat_with_bio$year,
+  dat_with_bio$quarter,
+  dat_with_bio$area,
+  dat_with_bio$fleet,
+  dat_with_bio$subFleet,
+  sep = " - "
+)
+
+dat_without_bio$level_1 <- paste(
+  dat_without_bio$year,
+  dat_without_bio$quarter,
+  dat_without_bio$area,
+  dat_without_bio$fleet,
+  dat_without_bio$subFleet,
+  sep = " - "
+)
+
+# Level 2
+
+dat_with_bio$level_2 <- paste(
+  dat_with_bio$year,
+  dat_with_bio$quarter,
+  dat_with_bio$area,
+  dat_with_bio$fleet,
+  dat_with_bio$subFleet,
+  sep = " - "
+)
+
+dat_without_bio$level_2 <- paste(
+  dat_without_bio$year_impu_v1,
+  dat_without_bio$quarter_impu_v1,
+  dat_without_bio$area,
+  dat_without_bio$fleet,
+  dat_without_bio$subFleet,
+  sep = " - "
+)
+
+# Level 3
+
+dat_with_bio$level_3 <- paste(
+  dat_with_bio$year,
+  dat_with_bio$quarter,
+  dat_with_bio$area,
+  dat_with_bio$fleet,
+  dat_with_bio$subFleet,
+  sep = " - "
+)
+
+
+dat_without_bio$level_3 <- paste(
+  dat_without_bio$year,
+  dat_without_bio$quarter_impu_v2,
+  dat_without_bio$area,
+  dat_without_bio$fleet,
+  dat_without_bio$subFleet,
+  sep = " - "
+)
+
+# level 4
+
+dat_with_bio$level_4 <- paste(
+  dat_with_bio$year,
+  dat_with_bio$quarter,
+  dat_with_bio$area_impu,
+  dat_with_bio$fleet,
+  dat_with_bio$subFleet,
+  sep = " - "
+)
+
+dat_without_bio$level_4 <- paste(
+  dat_without_bio$year,
+  dat_without_bio$quarter,
+  dat_without_bio$area_impu,
+  dat_without_bio$fleet,
+  dat_without_bio$subFleet,
+  sep = " - "
+)
+
+# level 5
+
+dat_with_bio$level_5 <- paste(
+  dat_with_bio$year,
+  dat_with_bio$quarter,
+  dat_with_bio$area_impu,
+  dat_with_bio$fleet,
+  dat_with_bio$subFleet,
+  sep = " - "
+)
+
+dat_without_bio$level_5 <- paste(
+  dat_without_bio$year_impu_v1,
+  dat_without_bio$quarter_impu_v1,
+  dat_without_bio$area_impu,
+  dat_without_bio$fleet,
+  dat_without_bio$subFleet,
+  sep = " - "
+)
+# level 6
+
+dat_with_bio$level_6 <- paste(
+  dat_with_bio$year,
+  dat_with_bio$quarter,
+  dat_with_bio$area_impu,
+  dat_with_bio$fleet,
+  dat_with_bio$subFleet,
+  sep = " - "
+)
+
+dat_without_bio$level_6 <- paste(
+  dat_without_bio$year,
+  dat_without_bio$quarter_impu_v2,
+  dat_without_bio$area_impu,
+  dat_without_bio$fleet,
+  dat_without_bio$subFleet,
+  sep = " - "
+)
+
+no_years <- length(unique(dat_without_bio$year)) - 1
+max_year <- max(dat_with_bio$year)
+
+for (y in c(1:no_years)) {
+  for (l in c(1:6)) {
+    eval(parse(text = paste0("dat_with_bio$level_", (l + (6 * y)),  " <- dat_with_bio$level_", l)))
+    
+    eval(parse(text = paste0("dat_without_bio$level_", (l + (6 * y)),  " <- dat_without_bio$level_", l)))
+    
+    for (q in c(1:nrow(dat_without_bio))) {
+      new_year <- as.numeric(stringr::str_extract(dat_without_bio[q, max(ncol(dat_without_bio))], "^[:digit:]+")) - y
+      dat_without_bio[q, max(ncol(dat_without_bio))] <- gsub("^\\d+", new_year , dat_without_bio[q, max(ncol(dat_without_bio))])
+    }
+    
+  }
+   
+}
+
+
+levels <- distinct(dat_without_bio, level_1, level_2, level_3, level_4, level_5, level_6)
+
+
+```
+
+# Loop over levels
+```{r}
+
+dat_imputed <- c()
+
+
+for (i in c(1:48)) {
+  # Identify level
+  
+  dat_with_bio$level_here <- dat_with_bio[, paste0("level_", i)]
+  dat_without_bio$level_here <- dat_without_bio[, paste0("level_", i)]
+  
+  
+  # Aggregate biology per level
+  dat_with_bio_canum_sum <- summarise(
+    group_by(dat_with_bio, level_here, wr),
+    weca = sum(canum * weca, na.rm = T) / sum(canum, na.rm = T),
+    n_per_kg = sum(canum, na.rm = T) / sum(canum * weca, na.rm = T)
+  )
+  
+  dat_with_bio_canum_sum$level <- i
+  dat_with_bio_canum_sum$level_used <- dat_with_bio_canum_sum$level_here
+  
+  dat_without_bio <- left_join(dat_without_bio, dat_with_bio_canum_sum)
+  
+  dat_imputed_here <- subset(dat_without_bio, !(is.na(level)))
+  dat_imputed <- rbind(dat_imputed, dat_imputed_here)
+  
+  dat_without_bio <- subset(dat_without_bio, (is.na(level)))
+  dat_without_bio <- select(dat_without_bio, -n_per_kg, -weca, -level, -level_used)
+  
+}
+
+arrange(distinct(dat_without_bio, year, ctry, quarter, area, fleet, subFleet))
+
+
+dat_all <- summarise(group_by(dat_new, year), t_all = sum(catch_t)/9)
+dat_with_bio_sum <- summarise(group_by(dat_with_bio, year), t_with_bio = sum(catch_t)/9)
+dat_imputed_sum <- summarise(group_by(dat_imputed, year), t_imputed = sum(catch_t)/9)
+dat_without_bio_sum <- summarise(group_by(dat_without_bio, year), t_without_bio = sum(catch_t)/9)
+
+comb <- left_join(left_join(left_join(dat_with_bio_sum, dat_imputed_sum), dat_without_bio_sum), dat_all)
+
+imputations <- distinct(dat_imputed, year, ctry, quarter, area, fleet, subFleet, level, level_used)
+```
+

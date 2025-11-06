@@ -15,13 +15,13 @@ library(knitr)
 
 options(scipen = 999)
 
-path_boot <- "./boot/data/"
-path_data <- "./data/"
+path_boot <- "../boot/data/"
+path_data <- "../data/"
 ```
 
 # Get data
 ## From Thomas
-```{r}
+```{r, include = F}
 path <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/stock_coord_work/her.27.20-24/2025_her.27.20-24_RDBES_combined_BM/boot/initial/data/historical_data/"
 
 t_canum <- read_xlsx(paste0(path, "WBSSH & NSASH_Input_04.06.2021.xlsx"), sheet = 1, col_names = T)[, c(1:14)]
@@ -47,7 +47,7 @@ t_cw$fleet <- t_cw$Fleet
 ```
 
 
-```{r}
+```{r, include = F}
 
 dat_old <- read.csv(paste0(path_data, "canum_old_format_3a.csv") ,sep = ";")
 
@@ -72,13 +72,13 @@ dat_sum <- summarise(group_by(dat_old, year, area, quarter, fleet, wr),
 ```
 
 # Split
-```{r}
+```{r, include = F}
 
 split <- read.csv(paste0(path_data, "split_old_format_3a.csv") ,sep = ";")
 ```
 
-# Aplly split
-```{r}
+# Apply split
+```{r, include = F}
 splitted <- left_join(dat_sum, split)
 
 # WBSS

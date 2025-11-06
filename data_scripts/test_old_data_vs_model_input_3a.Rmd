@@ -1,0 +1,136 @@
+---
+title: "test_old_data_vs_model_input_3a"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(readxl)
+library(dplyr)
+library(knitr)
+
+options(scipen = 999)
+
+path_boot <- "./boot/data/"
+path_data <- "./data/"
+```
+
+# Get data
+## From Thomas
+```{r}
+path <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/stock_coord_work/her.27.20-24/2025_her.27.20-24_RDBES_combined_BM/boot/initial/data/historical_data/"
+
+t_canum <- read_xlsx(paste0(path, "WBSSH & NSASH_Input_04.06.2021.xlsx"), sheet = 1, col_names = T)[, c(1:14)]
+
+t_canum <- tidyr::gather(t_canum, key = "wr", value = "canum_thomas", -Year, -Stock, -Area, -Fleet)
+
+t_canum <- subset(t_canum, Fleet %in% c("C", "D") & Year >= 2000 & wr != "TOTAL")
+
+
+t_weca <- read_xlsx(paste0(path, "WBSSH & NSASH_Input_04.06.2021.xlsx"), sheet = 2, col_names = T)[, c(1:13)]
+
+t_weca <- tidyr::gather(t_weca, key = "wr", value = "weca_thomas", -Year, -Stock, -Area, -Fleet)
+
+t_weca <- subset(t_weca, Fleet %in% c("C", "D") & Year >= 2000 & wr != "TOTAL")
+
+t_cw <- left_join(t_canum, t_weca)
+
+t_cw$wr <- gsub("WR ", "", t_cw$wr)
+t_cw$area[t_cw$Area == "IIIaN"] <- "27.3.a.20"
+t_cw$area[t_cw$Area == "IIIaS"] <- "27.3.a.21"
+t_cw$year <- t_cw$Year
+t_cw$fleet <- t_cw$Fleet
+```
+
+
+```{r}
+
+dat_old <- read.csv(paste0(path_data, "canum_old_format_3a.csv") ,sep = ";")
+
+# Test 
+dat_old_miss <- subset(dat_old, catch_t > 0 & canum %in% c(NA, 0))
+
+sop <- summarise(group_by(dat_old, ctry, year, area, 
+              quarter, fleet, catch_t),
+              sop = sum((canum * weca), na.rm = T))
+
+
+dat_old_sop <- left_join(dat_old, sop)
+dat_old_sop$sopCorr <- (dat_old_sop$catch_t / dat_old_sop$sop)
+
+nrow(subset(dat_old_sop, sopCorr != 1 & catch_t == 0))
+
+dat_sum <- summarise(group_by(dat_old, year, area, quarter, fleet, wr),
+                     weca_g = sum(weca * canum, na.rm = T) /
+                        sum(canum, na.rm = T),
+                     canum_1000 = sum(canum, na.rm = T))
+
+```
+
+# Split
+```{r}
+
+split <- read.csv(paste0(path_data, "split_old_format_3a.csv") ,sep = ";")
+```
+
+# Aplly split
+```{r}
+splitted <- left_join(dat_sum, split)
+
+# WBSS
+wbss <- splitted
+wbss$canum_1000 <- wbss$canum_1000 * wbss$wbss
+wbss$caton <- wbss$canum_1000 * wbss$weca_g / 1000
+
+wbss <-
+  aggregate(
+    cbind(canum_1000, caton) ~ year + wr + fleet + area,
+    data = wbss,
+    FUN = sum
+  )
+
+wbss$weca_g <- (wbss$caton * 1000 / wbss$canum_1000)
+wbss$Stock <- "WBSS"
+
+# NSAS
+nsas <- splitted
+nsas$canum_1000 <- nsas$canum_1000 * nsas$nsas
+nsas$caton <- nsas$canum_1000 * nsas$weca_g / 1000
+
+nsas <-
+  aggregate(
+    cbind(canum_1000, caton) ~ year + wr + fleet + area,
+    data = nsas,
+    FUN = sum
+  )
+
+nsas$weca_g <- (nsas$caton * 1000 / nsas$canum_1000)
+nsas$Stock <- "NSAS"
+
+```
+
+```{r}
+
+comb_wbss <- left_join(wbss, t_cw)
+comb_nsas <- left_join(nsas, t_cw)
+
+comb <- rbind(comb_wbss, comb_nsas)
+comb$canum_diff <- (comb$canum_thomas - comb$canum_1000) / comb$canum_thomas
+comb$weca_diff <- (comb$weca_thomas - comb$weca_g)
+
+library(ggplot2)
+
+ggplot(data = comb, aes(x = year, y = canum_diff, col = Stock)) +
+  geom_line() +
+  facet_grid(wr~area+fleet, scales = "free_y")
+
+ggplot(data = comb, aes(x = year, y = weca_diff, col = Stock)) +
+  geom_line() +
+  facet_grid(wr~area+fleet, scales = "free_y")
+
+```
+

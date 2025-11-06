@@ -83,7 +83,7 @@ split_07 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_nam
 
 # 2008
 ```{r, eval = T}
-file <- "HER-IIIa-2008new.xls" 
+file <- "HER-IIIa-2008newB.xls" 
 
 split_08 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
 ```
@@ -139,12 +139,14 @@ split_15 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_nam
 
 # Combine
 ```{r}
-dat <- bind_rows(split_00, split_01, split_02, split_03, split_04, split_05, 
+dat <- bind_rows(split_00, 
+                 split_01, split_02, split_03, split_04, split_05, 
                  split_06, split_07, split_08, split_09, split_10, 
                  split_11, split_12, split_13, split_14, split_15)
-rm(split_00, split_01, split_02, split_03, split_04, split_05, 
-                 split_06, split_07, split_08, split_09, split_10, 
-                 split_11, split_12, split_13, split_14, split_15)
+rm(split_00, 
+   split_01, split_02, split_03, split_04, split_05, 
+   split_06, split_07, split_08, split_09, split_10, 
+   split_11, split_12, split_13, split_14, split_15)
 unique(dat$year)
 unique(dat$area)
 names(dat)

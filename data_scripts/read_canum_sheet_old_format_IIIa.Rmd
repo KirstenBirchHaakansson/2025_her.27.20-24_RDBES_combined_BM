@@ -963,7 +963,8 @@ dat$ctry[dat$ctry == "DK"] <- "Denmark"
 dat$ctry[dat$ctry == "Faroee"] <- "Faroe Islands"
 dat$ctry[dat$ctry == "NLD"] <- "Nedtherlands"
 
-
+dat$canum_1000 <- dat$canum
+dat$weca_g <- dat$weca
 ```
 
 # Output

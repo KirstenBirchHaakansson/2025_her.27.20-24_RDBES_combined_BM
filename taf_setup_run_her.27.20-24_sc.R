@@ -41,6 +41,23 @@ draft.data(data.files = "updated_data_from_sweden",
            file = T,
            append = T)
 
+draft.data(data.files = "download_from_stockassessment_org_multi_fleet",
+           data.scripts = NULL,
+           originator = "Downloaded from SAM, Marts 2025",
+           title = "Multi fleet model data",
+           period = "1991-2024",
+           access = "Restricted",
+           file = T,
+           append = T)
+
+draft.data(data.files = "download_from_stockassessment_org_single_fleet",
+           data.scripts = NULL,
+           originator = "Downloaded from SAM, Marts 2025",
+           title = "Single fleet model data",
+           period = "1991-2024",
+           access = "Restricted",
+           file = T,
+           append = T)
 
 
 

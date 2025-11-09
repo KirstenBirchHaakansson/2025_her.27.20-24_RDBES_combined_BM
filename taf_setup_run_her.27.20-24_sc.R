@@ -25,8 +25,8 @@ draft.data(data.files = "historical_data",
 
 draft.data(data.files = "data_from_recent_years",
            data.scripts = NULL,
-           originator = "Data from previous AWG's",
-           title = "Data from previous AWG's",
+           originator = "Data from recent AWG's",
+           title = "Data from recent AWG's",
            period = "2016-2024",
            access = "Restricted",
            file = T,
@@ -59,7 +59,24 @@ draft.data(data.files = "download_from_stockassessment_org_single_fleet",
            file = T,
            append = T)
 
+draft.data(data.files = "split_data_from_recent_years",
+           data.scripts = NULL,
+           originator = "Data from recent AWG's",
+           title = "Data from recent AWG's",
+           period = "2016-2024",
+           access = "Restricted",
+           file = T,
+           append = T)
 
+
+draft.data(data.files = "updated_split_data",
+           data.scripts = NULL,
+           originator = "CMOE",
+           title = "Updated split data",
+           period = "2021-2024",
+           access = "Restricted",
+           file = T,
+           append = T)
 
 
 taf.boot()

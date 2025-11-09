@@ -132,7 +132,7 @@ split_14 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_nam
 
 # 2015
 ```{r, eval = T}
-file <- "HER-IIIa-2015.xls" 
+file <- "HER-IIIa-2015split-weighted.xls" 
 
 split_15 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
 ```
@@ -152,10 +152,11 @@ unique(dat$area)
 names(dat)
 
 dat <- select(dat, -division)
+dat$wr[dat$wr == "8"] <- "8+"
 ```
 
 # Output
 ```{r}
-write.table(dat, "../data/split_old_format_3a.csv", row.names = F, sep = ";")
+write.table(dat, "../data/old_split_2000_2015_SD20SD21.csv", row.names = F, sep = ";")
 ```
 

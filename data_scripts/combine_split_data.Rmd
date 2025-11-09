@@ -1,0 +1,130 @@
+---
+title: "combine_split_data"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, out.width = "150%",
+                      out.height = "200%")
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+options(scipen = 999)
+
+path_boot_old <- "../boot/data/split_data_from_recent_years/"
+path_boot_updated <- "../boot/data/updated_split_data/"
+path_data <- "../data/"
+```
+
+# Old split
+
+```{r}
+
+s0015 <- read.csv(paste0(path_data, "old_split_2000_2015_SD20SD21.csv"), sep = ";")
+
+s16 <- read.csv(paste0(path_boot_old, "3a_split_2016_v2.csv"), sep = ",")
+s16$wr <- ifelse(s16$wr == "8", "8+", s16$wr)
+
+s17 <- read.csv(paste0(path_boot_old, "input_C_split_proportions_3a_2017.csv"), sep = ",")
+s17$area <- ifelse(s17$area == "20", "27.3.a.20", "27.3.a.21")
+s17$wr <- ifelse(s17$wr == "8", "8+", s17$wr)
+
+s18 <- read.csv(paste0(path_boot_old, "Split_IIIa_2018.csv"), sep = ",")
+s18$area <- ifelse(s18$area == "20", "27.3.a.20", "27.3.a.21")
+s18$wr <- ifelse(s18$wr == "8", "8+", s18$wr)
+
+s19 <- read.csv(paste0(path_boot_old, "split_IIIa_2019_SWE_12-4.csv"), sep = ",")
+s19$area <- ifelse(s19$area == "20", "27.3.a.20", "27.3.a.21")
+s19$wr <- ifelse(s19$wr == "8", "8+", s19$wr)
+
+s20 <- read.csv(paste0(path_boot_old, "split_3a_2020_SWE_12-4.csv"), sep = ",")
+s20$area <- ifelse(s20$area == "20", "27.3.a.20", "27.3.a.21")
+s20$wr <- ifelse(s20$wr == "8", "8+", s20$wr)
+
+s21 <- read.csv(paste0(path_boot_old, "cmoe_split_2021_SD20SD21_v2.csv"), sep = ",")
+s21$area <- ifelse(s21$area == "20", "27.3.a.20", "27.3.a.21")
+s21$wr <- ifelse(s21$wr == "8", "8+", s21$wr)
+
+s22 <- read.csv(paste0(path_boot_old, "cmoe_split_2022_SD20SD21_v4.csv"), sep = ",")
+s22$area <- ifelse(s22$area == "20", "27.3.a.20", "27.3.a.21")
+s22$wr <- ifelse(s22$wr == "8", "8+", s22$wr)
+
+s23 <- read.csv(paste0(path_boot_old, "cmoe_split_2023_SD20SD21_v4_202403131539.csv"), sep = ",")
+s23$area <- ifelse(s23$area == "20", "27.3.a.20", "27.3.a.21")
+s23$wr <- ifelse(s23$wr == "8", "8+", s23$wr)
+
+s24 <- read.csv(paste0(path_boot_old, "cmoe_split_2024_SD20SD21_v2.csv"), sep = ",")
+s24$area <- ifelse(s24$area == "20", "27.3.a.20", "27.3.a.21")
+s24$wr <- ifelse(s24$wr == "8", "8+", s24$wr)
+
+split_0024 <- bind_rows(s0015, s16, s17, s18, s19, s20, s21, s22, s23, s24)
+split_0024 <- select(split_0024, year, area, quarter, wr, nsas, wbss, n)
+
+unique(split_0024$year)
+split_0024$type <- "old split"
+split_0024$year <- as.numeric(split_0024$year)
+```
+
+```{r}
+write.table(split_0024, "../data/old_split_2000_2024_SD20SD21.csv", row.names = F, sep = ";")
+```
+
+# Updated split
+```{r}
+us21 <- read.csv(paste0(path_boot_updated, "cmoe_split_2021_WKHERSPR.csv"), sep = ",")
+us21$area <- ifelse(us21$area == "20", "27.3.a.20", "27.3.a.21")
+us21$wr <- ifelse(us21$wr == "8", "8+", us21$wr)
+
+us22 <- read.csv(paste0(path_boot_updated, "cmoe_split_2022_WKHERSPR.csv"), sep = ",")
+us22$area <- ifelse(us22$area == "20", "27.3.a.20", "27.3.a.21")
+us22$wr <- ifelse(us22$wr == "8", "8+", us22$wr)
+
+us23 <- read.csv(paste0(path_boot_updated, "cmoe_split_2023_WKHERSPR.csv"), sep = ",")
+us23$area <- ifelse(us23$area == "20", "27.3.a.20", "27.3.a.21")
+us23$wr <- ifelse(us23$wr == "8", "8+", us23$wr)
+
+us24 <- read.csv(paste0(path_boot_updated, "cmoe_split_2024_WKHERSPR.csv"), sep = ",")
+us24$area <- ifelse(us24$area == "20", "27.3.a.20", "27.3.a.21")
+us24$wr <- ifelse(us24$wr == "8", "8+", us24$wr)
+
+updated_split_2124 <- bind_rows(us21, us22, us23, us24)
+updated_split_2124 <- select(updated_split_2124, year, area, quarter, wr, nsas, wbss, n)
+updated_split_2124$year <- as.numeric(updated_split_2124$year)
+
+# Update
+split_0020 <- subset(split_0024, !(year %in% unique(updated_split_2124$year)))
+unique(split_0020$year)
+
+updated_split_0024 <- bind_rows(split_0020, updated_split_2124)
+
+updated_split_0024$type <- "updated split"
+```
+
+```{r}
+write.table(updated_split_0024, "../data/updated_split_2000_2024_SD20SD21.csv", row.names = F, sep = ";")
+```
+
+# Compare
+```{r}
+split_all <- bind_rows(split_0024, updated_split_0024)
+
+for (i in levels(as.factor(split_all$area))) {
+  plot_dat <- subset(split_all, area == i)
+  
+  p <- ggplot(data = plot_dat, aes(x = year, y = wbss, col = type)) +
+    geom_line() +
+    scale_color_brewer(palette = "Dark2") +
+    facet_grid(wr ~ quarter, scales = "free_y") + 
+    expand_limits(y = 0) +
+    labs(title = i) +
+    theme(legend.position="bottom")
+  
+  print(p)
+}
+
+```
+

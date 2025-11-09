@@ -14,6 +14,7 @@ library(dplyr)
 source("../utils/read_canum_sheet_old_format_IIIa.R")
 
 path_in <- "../boot/data/historical_data/sc_sheets_old_format/"
+path_data <- "../data/"
 
 ```
 
@@ -978,14 +979,26 @@ dat$ctry[dat$ctry == "DK"] <- "Denmark"
 dat$ctry[dat$ctry == "Faroee"] <- "Faroe Islands"
 dat$ctry[dat$ctry == "NLD"] <- "Nedtherlands"
 
-dat$canum_1000 <- dat$canum
+dat$weca <- as.numeric(dat$weca)
+dat$canum <- as.numeric(dat$canum)
+dat$canum_1000 <- dat$canum * 1000
 dat$weca_g <- dat$weca
+
+# add all wr
+
+head <- distinct(dat, ctry, year, quarter, fleet, area, catch_t)
+wr <- distinct(subset(dat, !is.na(wr)), wr)
+full_wr <- cross_join(head, wr)
+
+dat_full_wr <- left_join(full_wr, dat)
+dat_full_wr$canum_1000[is.na(dat_full_wr$canum_1000)] <- 0
+
+dat <- dat_full_wr
 ```
 
 # Output
 ```{r}
 
-write.table(dat, "../data/canum_old_format_3a.csv", row.names = F, sep = ";")
-
+write.table(dat, paste0(path_data, "old_canum_with_imputations_2000_2015_IIIa.csv"), row.names = F, sep = ";")
 ```
 

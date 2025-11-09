@@ -12,14 +12,12 @@ library(readxl)
 library(dplyr)
 
 
-path_in <- "./boot/data/updated_data_from_sweden"
-path_data <- "./data/"
+path_in <- "../boot/data/updated_data_from_sweden"
+path_data <- "../data/"
 
 ```
 
-```{r, include = F}
-
-
+```{r}
 swe <- read.csv(
   paste0(path_in, "/WBSS_DEWK_SWE_2000_2024_IC_20-24_final.csv"),
   header = F,
@@ -132,6 +130,9 @@ colnames(sd) <- c(
   "varLgtLanded"
 )
 
+unique(sd$unitCanum)
+unique(sd$unitMeanWeight)
+
 sd <- select(
   sd,
   -recordType,
@@ -161,7 +162,7 @@ sd <- subset(sd, wr != 9)
 sisd <- left_join(si, sd)
 
 sisd$ctry <- "Sweden"
-sisd$canum_1000 <- as.numeric(sisd$numberCaught) / 1000
+sisd$canum_1000 <- as.numeric(sisd$numberCaught)
 sisd$weca_g <- as.numeric(sisd$meanWeight) * 1000
 sisd$year <- as.numeric(sisd$year)
 sisd$quarter <- as.numeric(sisd$quarter)
@@ -178,6 +179,7 @@ full_wr <- cross_join(head, wr)
 
 sisd_full_wr <- left_join(full_wr, sisd)
 sisd_full_wr$numberCaught[is.na(sisd_full_wr$numberCaught)] <- 0
+sisd_full_wr$canum_1000[is.na(sisd_full_wr$canum_1000)] <- 0
 
 
 swe <- sisd_full_wr
@@ -190,14 +192,17 @@ swe <- subset(swe,
                 "27.3.c.22",
                 "27.3.d.24"
               ))
+swe <- select(swe, -numberCaught, -meanWeight, -meanLength)
 
+swe_test <- summarise(group_by(swe, year, quarter, area, subFleet, wr),
+                      no_rows = length(canum_1000))
 ```
 
 
 # Output
 ```{r}
 
-write.table(dat, "./data/canum_old_format_22-24.csv", row.names = F, sep = ";")
+write.table(swe, paste0(path_data, "../data/updated_swe_canum_without_imputations_2000_2024.csv"), row.names = F, sep = ";")
 
 ```
 

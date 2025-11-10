@@ -27,7 +27,7 @@ path_data <- "../data/"
 
 ```{r}
 
-dat <-  read.csv(paste0("../data/updated_canum_without_imputations_2000_2024.csv"), sep = ";")
+dat <-  read.csv(paste0("../data/10_updated_canum_without_imputations_2000_2024.csv"), sep = ";")
 
 unique(dat$year)
 
@@ -776,11 +776,11 @@ nrow(subset(dat_imputed, sopCorr != 1))
 
 ```{r, include = F}
 
-write.table(dat_done, "../data/updated_canum_with_imputations_2000_2024.csv", row.names = F, sep = ";")
+write.table(dat_done, "../data/21_updated_canum_with_imputations_2000_2024.csv", row.names = F, sep = ";")
 
 
 # For split
-dat_split <- dat_done
+dat_split <- subset(dat_done, area %in% c("27.3.a.20", "27.3.a.21"))
 dat_split_sum <- summarise(group_by(dat_split, year, ctry, area, 
                                       quarter, wr),
                              canumNew_1000 = sum(canum_1000, na.rm = T),
@@ -791,6 +791,6 @@ dat_split_sum$weca_kg <- dat_split_sum$weca_g / 1000
 dat_split_sum$canumNew_1000000 <- dat_split_sum$canumNew_1000 / 1000
 
 
-write.table(dat_split_sum, "../data/updated_canum_with_imputations_for_split_2000_2024.csv", row.names = F, sep = ";")
+write.table(dat_split_sum, "../data/21_updated_canum_with_imputations_for_split_2000_2024.csv", row.names = F, sep = ";")
 
 ```

@@ -977,6 +977,7 @@ dat$area[dat$division == "Skagerrak"] <- "27.3.a.20"
 
 dat$ctry[dat$ctry == "DK"] <- "Denmark"
 dat$ctry[dat$ctry == "Faroee"] <- "Faroe Islands"
+dat$ctry[dat$ctry == "Faroese"] <- "Faroe Islands"
 dat$ctry[dat$ctry == "NLD"] <- "Nedtherlands"
 
 dat$weca <- as.numeric(dat$weca)
@@ -999,6 +1000,6 @@ dat <- dat_full_wr
 # Output
 ```{r}
 
-write.table(dat, paste0(path_data, "old_canum_with_imputations_2000_2015_IIIa.csv"), row.names = F, sep = ";")
+write.table(dat, paste0(path_data, "01_old_canum_with_imputations_2000_2015_IIIa.csv"), row.names = F, sep = ";")
 ```
 

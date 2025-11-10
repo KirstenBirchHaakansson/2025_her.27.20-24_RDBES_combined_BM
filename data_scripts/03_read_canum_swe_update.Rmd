@@ -202,7 +202,7 @@ swe_test <- summarise(group_by(swe, year, quarter, area, subFleet, wr),
 # Output
 ```{r}
 
-write.table(swe, paste0(path_data, "../data/updated_swe_canum_without_imputations_2000_2024.csv"), row.names = F, sep = ";")
+write.table(swe, paste0(path_data, "03_updated_swe_canum_without_imputations_2000_2024.csv"), row.names = F, sep = ";")
 
 ```
 

@@ -1,0 +1,208 @@
+---
+title: "read_in"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(readxl)
+library(dplyr)
+
+
+path_in <- "../boot/data/updated_data_from_sweden"
+path_data <- "../data/"
+
+```
+
+```{r}
+swe <- read.csv(
+  paste0(path_in, "/WBSS_DEWK_SWE_2000_2024_IC_20-24_final.csv"),
+  header = F,
+  sep = ",",
+  colClasses = "character",
+  fill = T,
+  col.names = paste0("V", seq_len(33))
+)
+
+
+hi <- subset(swe, swe$V1 == "HI")[, c(1:12)]
+colnames(hi) <- c(
+  "recordType",
+  "country",
+  "year",
+  "seasonType",
+  "season",
+  "fleet",
+  "areaType",
+  "fisghingArea",
+  "depthRange",
+  "unitEffort",
+  "effort",
+  "areaQualifier"
+)
+
+si <- subset(swe, swe$V1 == "SI")[, c(1:24)]
+colnames(si) <- c(
+  "recordType",
+  "ctry",
+  "year",
+  "seasonType",
+  "quarter",
+  "subFleet",
+  "areaType",
+  "area",
+  "depthRange",
+  "sppName",
+  "stock",
+  "catchCategory",
+  "reportingCategory",
+  "dataToForm",
+  "usage",
+  "samplesOrigin",
+  "qualityFlag",
+  "unitCaton",
+  "catch_t",
+  "offLandings",
+  "varCaton",
+  "infoFleet",
+  "infoStockCoordinator",
+  "infoGeneral"
+)
+
+unique(si$unitCaton)
+si$catch_t[is.na(si$catch_t)] <- si$offLandings[is.na(si$catch_t)]
+
+si <- select(
+  si,
+  -recordType,
+  -seasonType,
+  -areaType,
+  -depthRange,
+  -stock,-catchCategory,
+  -reportingCategory,
+  -dataToForm,
+  -usage,
+  -samplesOrigin,-qualityFlag,
+  -unitCaton,
+  -offLandings,
+  -varCaton,
+  -infoFleet,-infoStockCoordinator,
+  -infoGeneral
+)
+
+sd <- subset(swe, swe$V1 == "SD")[, c(1:33)]
+colnames(sd) <- c(
+  "recordType",
+  "ctry",
+  "year",
+  "seasonType",
+  "quarter",
+  "subFleet",
+  "areaType",
+  "area",
+  "depthRange",
+  "sppName",
+  "stock",
+  "catchCategory",
+  "reportingCategory",
+  "sex",
+  "canumType",
+  "wr",
+  "plusGroup",
+  "sampledCatch",
+  "noSample",
+  "noLength",
+  "numSamplesAge",
+  "noAge",
+  "unitMeanWeight",
+  "unitCanum",
+  "unitAgeOrLength",
+  "unitMeanLength",
+  "maturity",
+  "numberCaught",
+  "meanWeight",
+  "meanLength",
+  "varNumLanded",
+  "varWgtLanded",
+  "varLgtLanded"
+)
+
+unique(sd$unitCanum)
+unique(sd$unitMeanWeight)
+
+sd <- select(
+  sd,
+  -recordType,
+  -seasonType,
+  -areaType,
+  -depthRange,
+  -stock,-catchCategory,
+  -reportingCategory,
+  -sex,-canumType,
+  -plusGroup,
+  -sampledCatch,
+  -unitMeanWeight,
+  -unitCanum,-unitAgeOrLength,
+  -unitMeanLength,
+  -maturity,
+  -numSamplesAge,-varNumLanded,
+  -varWgtLanded,
+  -varLgtLanded
+)
+
+
+test_wr <- subset(sd, wr == 9)
+unique(test_wr$area)
+sd <- subset(sd, wr != 9)
+
+
+sisd <- left_join(si, sd)
+
+sisd$ctry <- "Sweden"
+sisd$canum_1000 <- as.numeric(sisd$numberCaught)
+sisd$weca_g <- as.numeric(sisd$meanWeight) * 1000
+sisd$year <- as.numeric(sisd$year)
+sisd$quarter <- as.numeric(sisd$quarter)
+sisd$catch_t <- as.numeric(sisd$catch_t)
+sisd$wr[sisd$wr == "8"] <- "8+"
+sisd$noSample <- as.numeric(sisd$noSample)
+sisd$noLength <- as.numeric(sisd$noLength)
+sisd$noAge <- as.numeric(sisd$noAge)
+
+head <- distinct(sisd, ctry, year, quarter, subFleet, area, sppName, catch_t)
+
+wr <- distinct(subset(sisd, !is.na(wr)), wr)
+full_wr <- cross_join(head, wr)
+
+sisd_full_wr <- left_join(full_wr, sisd)
+sisd_full_wr$numberCaught[is.na(sisd_full_wr$numberCaught)] <- 0
+sisd_full_wr$canum_1000[is.na(sisd_full_wr$canum_1000)] <- 0
+
+
+swe <- sisd_full_wr
+
+swe <- subset(swe,
+              area %in% c(
+                "27.3.a.20",
+                "27.3.a.21",
+                "27.3.b.23",
+                "27.3.c.22",
+                "27.3.d.24"
+              ))
+swe <- select(swe, -numberCaught, -meanWeight, -meanLength)
+
+swe_test <- summarise(group_by(swe, year, quarter, area, subFleet, wr),
+                      no_rows = length(canum_1000))
+```
+
+
+# Output
+```{r}
+
+write.table(swe, paste0(path_data, "updated_swe_canum_without_imputations_2000_2024.csv"), row.names = F, sep = ";")
+
+```
+

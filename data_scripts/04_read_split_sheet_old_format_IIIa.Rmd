@@ -1,0 +1,162 @@
+---
+title: "read_in"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(readxl)
+library(dplyr)
+
+source("../utils/read_split_sheet_old_format_IIIa.R")
+
+path_in <- "../boot/data/historical_data/sc_sheets_old_format/"
+
+```
+
+# 2000
+```{r, eval = T}
+file <- "HER-IIIa-2000-revised ex-Norway.xls" 
+
+split_00 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2001
+```{r, eval = T}
+file <- "HER-IIIa-2001-revised ex- Norway.xls" 
+
+split_01 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+
+# Wrong year in file - checked that the figures are similar to the hawg 2002 report
+
+split_01$year <- 2001
+```
+
+# 2002
+```{r, eval = T}
+file <- "HER-IIIa-2002-with revised Swedish data.xls" 
+
+split_02 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2003
+```{r, eval = T}
+file <- "HER-IIIa-2003 revised 110304.xls" 
+
+split_03 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2004
+```{r, eval = T}
+file <- "HER-IIIa-2004.xls" 
+
+split_04 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+
+# Wrong year in file - checked that the figures are similar to the hawg 2005 report
+
+split_04$year <- 2004
+```
+
+# 2005
+```{r, eval = T}
+file <- "HER-IIIa-2005_ok.xls" 
+
+split_05 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2006
+```{r, eval = T}
+file <- "HER-IIIa-2006.xls" 
+
+split_06 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2007
+```{r, eval = T}
+file <- "HER-IIIa-2007new.xls" 
+
+split_07 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2008
+```{r, eval = T}
+file <- "HER-IIIa-2008newB.xls" 
+
+split_08 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2009
+```{r, eval = T}
+file <- "HER-IIIa-2009hm.xls" 
+
+split_09 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2010
+```{r, eval = T}
+file <- "HER-IIIa-2010.xls" 
+
+split_10 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2011
+```{r, eval = T}
+file <- "HER-IIIa-2011.xls" 
+
+split_11 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2012
+```{r, eval = T}
+file <- "HER-IIIa-2012.xls" 
+
+split_12 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2013
+```{r, eval = T}
+file <- "HER-IIIa-2013.xls" 
+
+split_13 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2014
+```{r, eval = T}
+file <- "HER-IIIa-2014.xls" 
+
+split_14 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# 2015
+```{r, eval = T}
+file <- "HER-IIIa-2015split-weighted.xls" 
+
+split_15 <- read_split_sheet_format_IIIa(file = paste0(path_in, file), sheet_name = "SPLIT-IIIa")
+```
+
+# Combine
+```{r}
+dat <- bind_rows(split_00, 
+                 split_01, split_02, split_03, split_04, split_05, 
+                 split_06, split_07, split_08, split_09, split_10, 
+                 split_11, split_12, split_13, split_14, split_15)
+rm(split_00, 
+   split_01, split_02, split_03, split_04, split_05, 
+   split_06, split_07, split_08, split_09, split_10, 
+   split_11, split_12, split_13, split_14, split_15)
+unique(dat$year)
+unique(dat$area)
+names(dat)
+
+dat <- select(dat, -division)
+dat$wr[dat$wr == "8"] <- "8+"
+```
+
+# Output
+```{r}
+write.table(dat, "../data/04_old_split_2000_2015_SD20SD21.csv", row.names = F, sep = ";")
+```
+

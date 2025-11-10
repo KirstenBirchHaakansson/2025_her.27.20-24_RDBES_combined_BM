@@ -1,0 +1,777 @@
+---
+title: "read_in"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+library(readxl)
+library(dplyr)
+
+source("../utils/read_canum_sheet_old_format_22-24.R")
+
+path_in <- "../boot/data/historical_data/sc_sheets_old_format/"
+path_data <- "../data/"
+
+```
+
+# 2000
+```{r}
+file <- "INT-Herring-22-24-00_end.xls" 
+# Fleet E and not fleet D is used - 
+#  in the summary and report it looks like E become D, so this will be corrected in the end
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "24"] <- "Imputed"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "Imputed"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "24"] <- "Imputed"
+
+c00 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c00, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c00, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2001
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2001 revised.xls" 
+# Fleet E and not fleet D is used - 
+#  in the summary and report it looks like E become D, so this will be corrected in the end
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 1 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 2 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "24"] <- "Imputed"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "Imputed"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "24"] <- "Imputed"
+
+c01 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c01, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c01, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2002
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2002 with revised Swedish data.xls" 
+# Fleet E and not fleet D is used - 
+#  in the summary and report it looks like E become D, so this will be corrected in the end
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation[PL$quarter == 3 & PL$division == "24"] <- "Imputed"
+PL$imputation[PL$quarter == 4 & PL$division == "24"] <- "Imputed"
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 1 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 2 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "Imputed"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 4 & DK$division == "24"] <- "Imputed"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "Imputed"
+
+c02 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c02, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c02, year, division), canum = sum(canum, na.rm = T))
+
+```
+# 2003
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2003.xls" 
+# Fleet E and not fleet D is used - 
+#  in the summary and report it looks like E become D, so this will be corrected in the end
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 1 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 2 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "Imputed"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "Imputed"
+DK$imputation[DK$quarter == 4 & DK$division == "24"] <- "Imputed"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "Imputed"
+
+c03 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c03, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c03, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2004
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2004.xls" 
+# Fleet E and not fleet D is used - 
+#  in the summary and report it looks like E become D, so this will be corrected in the end
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 1 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 2 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "Imputed"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "Imputed"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "Imputed"
+
+c04 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c04, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c04, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2005
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2005_ok.xls" 
+# Fleet E and not fleet D is used - 
+#  in the summary and report it looks like E become D, so this will be corrected in the end
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 1 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 2 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "Imputed"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "Imputed"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "Imputed"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "Imputed"
+
+c05 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c05, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c05, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2006
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
+
+```{r, eval = T}
+file <- "T_3-3-9_INT-herring_22-24_2007.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 1 & DE$division == "22"] <- "DK, F, Q1, 22"
+DE$imputation[DE$quarter == 2 & DE$division == "22"] <- "DK, F, Q1, 22"
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "DE, F, Q4, 24"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "DE, F, Q4, 24"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "DE, F, Q4, 24"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 2 & DK$division == "22"] <- "DK, F, Q1, 22"
+DK$imputation[DK$quarter == 3 & DK$division == "22"] <- "SE, F, Q3, 24"
+DK$imputation[DK$quarter == 4 & DK$division == "22"] <- "SE, F, Q4, 24"
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "Imputed"
+DK$imputation[DK$quarter == 1 & DK$division == "24"] <- "Imputed"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "Imputed"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "Imputed"
+
+c06 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c06, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c06, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+
+# 2007
+
+Total CATON and CANUM checked against spread sheet: ok
+
+Imputations checked against spread sheet and report if unclear: ok
+```{r, eval = T}
+file <- "T_3-3-9_INT-herring_22-24_2007_other.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "DK, F, Q4, 22"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "DK, F, Q4, 22"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "DK, F, Q4, 24"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "KASU"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "KASU"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "DK, F, Q4, 24"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 3 & SE$division == "24"] <- "DK, F, Q4, 24"
+
+c07 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c07, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c07, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+
+# 2008
+
+Total CATON and CANUM checked against spread sheet: ok
+
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2008.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+PL$imputation[PL$quarter == 3 & PL$division == "24"] <- "DK, F, Q4, 24"
+PL$imputation[PL$quarter == 4 & PL$division == "24"] <- "DK, F, Q4, 24"
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 1 & DE$division == "22"] <- "DE, F, Q2, 22"
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "DK, F, Q4, 22"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "DK, F, Q4, 22"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "DE, F, Q4, 24"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 4 & DK$division == "22"] <- "DK, F, Q3, 22"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "DK, F, Q4, 23"
+DK$imputation[DK$quarter == 2 & DK$division == "24"] <- "DK, F, Q1, 23"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "DK, F, Q4, 23"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "SE, F, Q2, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q3, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+
+c08 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c08, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c08, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2009
+
+Total CATON and CANUM checked against spread sheet: ok
+
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2009.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+PL$imputation[PL$quarter == 3 & PL$division == "24"] <- "DK, F, Q3, 24"
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+DE$imputation[DE$quarter == 3 & DE$division == "22"] <- "DK, F, Q3, 22"
+DE$imputation[DE$quarter == 4 & DE$division == "22"] <- "DK, F, Q4, 22"
+DE$imputation[DE$quarter == 3 & DE$division == "24"] <- "DE, F, Q4, 24"
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "DK, F, Q1, 23"
+DK$imputation[DK$quarter == 1 & DK$division == "24"] <- "DK, F, Q2, 23"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "DK, F, Q4, 23"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 2 & SE$division == "24"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "24"] <- "SE, F, Q4, 24"
+
+c09 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c09, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c09, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2010
+
+Total CATON and CANUM checked against spread sheet: ok
+
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2010.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "DK, F, Q1, 22"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "DK, F, Q1, 23"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "DE, F, Q3, 23"
+DK$imputation[DK$quarter == 4 & DK$division == "24"] <- "DE, F, Q4, 23"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "24"] <- "SE, F, Q4, 24"
+
+c10 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c10, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c10, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2011
+
+Total CATON and CANUM checked against spread sheet: ok
+
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2011.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 3 & DK$division == "22"] <- "DK, F, Q4, 22"
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "DK, F, Q1, 22"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "DK, F, Q1, 22"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "DK, F, Q4, 22"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "DK, F, Q4, 22"
+DK$imputation[DK$quarter == 1 & DK$division == "24"] <- "DK, F, Q1, 24"
+DK$imputation[DK$quarter == 2 & DK$division == "24"] <- "DE, F, Q2, 24"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "DE, F, Q3, 24"
+DK$imputation[DK$quarter == 4 & DK$division == "24"] <- "DE, F, Q4, 24"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 2 & SE$division == "24"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "24"] <- "SE, F, Q4, 24"
+
+c11 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c11, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c11, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2012
+
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2012.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 2 & DK$division == "22"] <- "DK, F, Q1, 22"
+DK$imputation[DK$quarter == 3 & DK$division == "22"] <- "DK, F, Q4, 22"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "DK, F, Q1, 23"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "DK, F, Q4, 23"
+DK$imputation[DK$quarter == 2 & DK$division == "24"] <- "DK, F, Q1, 24"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "DK, F, Q4, 24"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "24"] <- "SE, F, Q4, 24"
+
+c12 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c12, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c12, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2013
+
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2013.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 1 & DK$division == "23"] <- "DK, F, Q1, 24"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "DK, F, Q2, 24"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "DK, F, Q3, 24"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "DK, F, Q4, 24"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 2 & SE$division == "24"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "24"] <- "SE, F, Q4, 24"
+
+c13 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c13, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c13, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# 2014
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "Copy of T_3-3-9_INT-herring_22-24_2014_corrected.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 2 & DK$division == "22"] <- "DK, F, Q1, 22"
+DK$imputation[DK$quarter == 3 & DK$division == "22"] <- "DK, F, Q4, 22"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "DK, F, Q1, 23"
+DK$imputation[DK$quarter == 4 & DK$division == "24"] <- "DK, F, Q3, 24"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+
+c14 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c14, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c14, year, division), canum = sum(canum, na.rm = T))
+
+```
+# 2015
+Total CATON and CANUM checked against spread sheet: ok
+Imputations checked against spread sheet and report if unclear: ok
+```{r}
+file <- "T_3-3-9_INT-herring_22-24_2015.xls"
+
+sheet_names <- excel_sheets(path = paste0(path_in, file))
+
+PL <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-Pl")
+sum(unique(PL$catch_t))
+PL$imputation <- NA
+
+DE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24- GE")
+sum(unique(DE$catch_t))
+DE$imputation <- NA
+
+DK <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-DK")
+sum(unique(DK$catch_t))
+DK$imputation <- NA
+DK$imputation[DK$quarter == 2 & DK$division == "22"] <- "DK, F, Q1, 22"
+DK$imputation[DK$quarter == 3 & DK$division == "22"] <- "DK, F, Q4, 22"
+DK$imputation[DK$quarter == 2 & DK$division == "23"] <- "DK, F, Q2, 24"
+DK$imputation[DK$quarter == 3 & DK$division == "23"] <- "DK, F, Q4, 24"
+DK$imputation[DK$quarter == 4 & DK$division == "23"] <- "DK, F, Q4, 24"
+DK$imputation[DK$quarter == 3 & DK$division == "24"] <- "DE, F, Q4, 24"
+DK$imputation[DK$quarter == 4 & DK$division == "24"] <- "DE, F, Q4, 24"
+
+SE <- read_canum_sheet_old_format_IIIa(file = paste0(path_in, file), sheet_name = "22-24-SE")
+sum(unique(SE$catch_t))
+SE$imputation[SE$quarter == 3 & SE$division == "22"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 1 & SE$division == "23"] <- "DK, F, Q1, 22"
+SE$imputation[SE$quarter == 2 & SE$division == "23"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 4 & SE$division == "23"] <- "SE, F, Q4, 24"
+SE$imputation[SE$quarter == 2 & SE$division == "24"] <- "SE, F, Q1, 24"
+SE$imputation[SE$quarter == 3 & SE$division == "24"] <- "SE, F, Q4, 24"
+
+c15 <- bind_rows(PL, DE, DK, SE)
+
+rm(PL, DE, DK, SE)
+
+summarise(group_by(subset(c15, wr == "8+"), year, division), ton = sum(catch_t, na.rm = T))
+summarise(group_by(c15, year, division), canum = sum(canum, na.rm = T))
+
+```
+
+# Combine
+```{r}
+
+dat <- bind_rows(c00, c01, c02, c03, c04, c05, c06, c07, c08, c09, c10, c11, c12, c13, c14, c15)
+rm(c00, c01, c02, c03, c04, c05, c06, c07, c08, c09, c10, c11, c12, c13, c14, c15)
+unique(dat$year)
+unique(dat$ctry)
+unique(dat$division)
+
+# Clean up codes
+dat$area <- NA
+dat$area[dat$division == "22"] <- "27.3.c.22"
+dat$area[dat$division == "23"] <- "27.3.b.23"
+dat$area[dat$division == "24"] <- "27.3.d.24"
+
+dat$ctry[dat$ctry == "DK"] <- "Denmark"
+dat$ctry[dat$ctry == "Faroee"] <- "Faroe Islands"
+dat$ctry[dat$ctry == "NLD"] <- "Nedtherlands"
+
+dat$fleet <- as.character(dat$fleet)
+dat$year <- as.integer(dat$year)
+
+dat$weca <- as.numeric(dat$weca)
+dat$canum <- as.numeric(dat$canum)
+dat$canum_1000 <- dat$canum * 1000
+dat$weca_g <- dat$weca
+
+# add all wr
+
+head <- distinct(dat, ctry, year, quarter, fleet, area, catch_t)
+wr <- distinct(subset(dat, !is.na(wr)), wr)
+full_wr <- cross_join(head, wr)
+
+dat_full_wr <- left_join(full_wr, dat)
+dat_full_wr$canum_1000[is.na(dat_full_wr$canum_1000)] <- 0
+
+dat <- dat_full_wr
+```
+
+# Output
+```{r}
+
+write.table(dat, paste0(path_data, "02_old_canum_with_imputations_2000_2015_22-24.csv"), row.names = F, sep = ";")
+saveRDS(dat, paste0(path_data, "02_old_canum_with_imputations_2000_2015_22-24.rds"))
+```
+

@@ -1,0 +1,122 @@
+---
+title: "combine_canum_files"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, out.width = "150%",
+                      out.height = "200%")
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+options(scipen = 999)
+
+path_data <- "../data/"
+```
+
+# 27.3.a
+## historical data 2000-2015
+```{r, include = F}
+dat_old_3a <- read.csv(paste0(path_data, "old_canum_with_imputations_2000_2015_IIIa.csv") ,sep = ";")
+unique(dat_old_3a$year)
+unique(dat_old_3a$ctry)
+
+
+dat_old_2224 <- readRDS(paste0(path_data, "old_canum_with_imputations_2000_2015_22-24.rds"))
+unique(dat_old_2224$year)
+unique(dat_old_2224$ctry)
+
+
+dat_old <- bind_rows(dat_old_2224, dat_old_3a)
+
+```
+
+
+## files from recent years 2016-2024
+
+```{r, include = F}
+dat_16 <- read.csv(paste0("../boot/data/data_from_recent_years/1_canum_2016.csv"))
+
+years <- c(2017:2024)
+dat_new <- c()
+
+for (i in years) {
+  
+  dat_0 <- read.csv(paste0("../boot/data/data_from_recent_years/C1_her2024_canum_without_imputations_", i, ".csv"))
+  dat_0 <- subset(dat_0, year == i)
+  dat_new <- bind_rows(dat_new, dat_0)
+  
+}
+unique(dat_new$year)
+unique(dat_new$ctry)
+
+dat_new <- bind_rows(dat_16, dat_new)
+```
+
+```{r}
+dat_org <- bind_rows(dat_old, dat_new)
+```
+
+
+## Swedish update
+```{r}
+swe <- read.csv(paste0(path_data, "updated_swe_canum_without_imputations_2000_2024.csv") ,sep = ";")
+str(swe)
+```
+
+
+# Combine present time series
+```{r, include = F}
+dat_org <- bind_rows(dat_new, dat_old)
+distinct(dat_org, ctry, area)
+
+write.table(dat_org, "../data/C1_her2024_canum_without_imputations_present_time_series.csv", row.names = F, sep = ";")
+
+```
+
+# Update with Swedish data
+```{r, include = F}
+
+dat_org_m_swe <- subset(dat_org, ctry != "Sweden")
+
+test <- bind_rows(dat_org_m_swe, swe)
+test$canum_1000[!(is.na(test$imputation))] <- 0
+test$weca_g[!(is.na(test$imputation))] <- NA
+
+write.table(test, "../data/updated_canum_without_imputations_2000_2024.csv", row.names = F, sep = ";")
+
+
+
+sop <- summarise(group_by(test, ctry, sppName, year, area, 
+              quarter, fleet, subFleet, catch_t),
+              sop = sum((canum_1000 * weca_g) / 1000, na.rm = T))
+
+
+test_sop <- left_join(select(test, -sop), sop)
+test_sop$sopCorr <- (test_sop$catch_t / test_sop$sop)
+
+nrow(subset(test_sop, sopCorr != 1))
+
+swe_org <- subset(dat_org, ctry == "Sweden")
+swe_org_sum <- summarise(group_by(subset(swe_org, wr == "8+"), year, area), ton = sum(catch_t, na.rm = T))
+swe_org_sum$type <- "present"
+
+swe_new_sum <- summarise(group_by(subset(swe, wr == "8+"), year, area), ton = sum(catch_t, na.rm = T))
+swe_new_sum$type <- "update"
+
+swe_comb <- bind_rows(swe_org_sum, swe_new_sum)
+
+```
+
+```{r}
+
+ggplot(data = swe_comb, aes(x = year, y = ton, col = type)) +
+  geom_line() +
+  facet_wrap(~area, scales = "free_y") +
+    theme(legend.position="bottom")
+```
+

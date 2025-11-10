@@ -14,6 +14,7 @@ library(dplyr)
 source("../utils/read_canum_sheet_old_format_22-24.R")
 
 path_in <- "../boot/data/historical_data/sc_sheets_old_format/"
+path_data <- "../data/"
 
 ```
 
@@ -747,6 +748,8 @@ dat$ctry[dat$ctry == "DK"] <- "Denmark"
 dat$ctry[dat$ctry == "Faroee"] <- "Faroe Islands"
 dat$ctry[dat$ctry == "NLD"] <- "Nedtherlands"
 
+dat$fleet <- as.character(dat$fleet)
+dat$year <- as.integer(dat$year)
 
 dat$weca <- as.numeric(dat$weca)
 dat$canum <- as.numeric(dat$canum)
@@ -769,6 +772,6 @@ dat <- dat_full_wr
 ```{r}
 
 write.table(dat, paste0(path_data, "old_canum_with_imputations_2000_2015_22-24.csv"), row.names = F, sep = ";")
-
+saveRDS(dat, paste0(path_data, "old_canum_with_imputations_2000_2015_22-24.rds"))
 ```
 

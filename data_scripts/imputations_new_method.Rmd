@@ -27,9 +27,7 @@ path_data <- "../data/"
 
 ```{r}
 
-dat <-  read.csv(paste0("../data/C1_her2024_canum_without_imputations_updated_swe.csv"), sep = ";")
-
-dat <- subset(dat, area %in% c("27.3.a.20", "27.3.a.21"))
+dat <-  read.csv(paste0("../data/updated_canum_without_imputations_2000_2024.csv"), sep = ";")
 
 unique(dat$year)
 
@@ -54,22 +52,35 @@ dat <- left_join(dat, dat_unique)
 # dat$subFleet[is.na(dat$subFleet)] <- dat$fleet[is.na(dat$subFleet)]
 dat$subFleet[dat$ctry == "Denmark" &
                dat$fleet == "C"] <- "trawl >= 32mm"
-# dat$subFleet[dat$ctry %in% c("Germany",
-#                              "Lithuania",
-#                              "Nedtherlands",
-#                              "Faroe Islands",
-#                              "Faroe Islands ",
-#                              "Faroese") &
-#                dat$fleet == "C"] <- "trawl >= 32mm" # This I don't know for sure
+dat$subFleet[dat$ctry %in% c("Germany",
+                             "Lithuania",
+                             "Nedtherlands",
+                             "Faroe Islands",
+                             "Faroe Islands ",
+                             "Faroese") &
+               dat$fleet == "C"] <- NA
+dat$subFleet[dat$ctry %in% c("Germany",
+                             "Lithuania",
+                             "Nedtherlands",
+                             "Faroe Islands",
+                             "Faroe Islands ",
+                             "Faroese") &
+               dat$fleet == "D"] <- NA
 dat$subFleet[dat$ctry == "Denmark" &
                dat$fleet == "D"] <- "trawl < 32mm"
 dat$subFleet[dat$ctry == "Norway" &
                dat$fleet == "C"] <- "purse seine"
 
 dat$subFleet[dat$subFleet == "Trawl_>=32mm"] <- "trawl >= 32mm"
+dat$subFleet[dat$subFleet == "active >= 32mm"] <- "trawl >= 32mm"
 dat$subFleet[dat$subFleet == "Trawl_<32mm"] <- "trawl < 32mm"
+dat$subFleet[dat$subFleet == "active < 32mm"] <- "trawl < 32mm"
 dat$subFleet[dat$subFleet == "PS"] <- "purse seine"
 dat$subFleet[dat$subFleet == "Passive"] <- "passive"
+dat$subFleet[dat$subFleet == "F - passive"] <- "passive"
+dat$subFleet[dat$subFleet == "F - passive"] <- "passive"
+dat$subFleet[dat$subFleet == "F - active"] <- "trawl >= 32mm" # This may not be correct
+
 
 dat$fleet[dat$subFleet == "passive" &
             dat$area %in% c("27.3.a.20", "27.3.a.21")] <- "C"
@@ -79,14 +90,24 @@ dat$fleet[dat$subFleet == "trawl >= 32mm" &
             dat$area %in% c("27.3.a.20", "27.3.a.21")] <- "C"
 dat$fleet[dat$subFleet == "trawl < 32mm" &
             dat$area %in% c("27.3.a.20", "27.3.a.21")] <- "D"
+dat$fleet[!(dat$area %in% c("27.3.a.20", "27.3.a.21"))] <- "F"
 
 unique(dat$subFleet)
 
+check_fleets <- arrange(distinct(dat, ctry, area, fleet, subFleet), area, fleet, subFleet)
+```
+
+## Check fleets
+```{r, echo = F}
+datatable(check_fleets, filter = 'top', options = list(
+  pageLength = nrow(check_fleets), autoWidth = F, scrollY = F
+),
+class = 'cell-border stripe')
 ```
 
 # Create imputation domains
 
-```{r, include = F}
+```{r, include = T}
 
 # Identify strata with biology
 

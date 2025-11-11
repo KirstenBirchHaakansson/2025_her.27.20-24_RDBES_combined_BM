@@ -28,9 +28,9 @@ for (i in c("A", "C", "D", "F")) {
   
 }
 
-cn_t <- tidyr::gather(cn, key = "wr", value = "canum_1000", -year, -fleet)
+cn_t <- tidyr::gather(cn, key = "wr", value = "wbss_canum_1000", -year, -fleet)
 cn_t$wr <- gsub("wr", "", cn_t$wr)
-cn_t$canum_1000 <- as.numeric(cn_t$canum_1000)
+cn_t$wbss_canum_1000 <- as.numeric(cn_t$wbss_canum_1000)
 cn_t$stock <- "wbss"
 
 cw <- c()

@@ -1,0 +1,143 @@
+---
+title: "compare_updated_caton_vs_present_caton"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+Here I compare the updated CATON with table 3.1.1, so unsplitted. Table 3.1.1 do not necessarily reflect what is in the model
+
+**Summary**
+
+Overall it looks very nice, but there are large difference for some combinations of year, country and area
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, out.width = "150%",
+                      out.height = "200%")
+library(dplyr)
+library(ggplot2)
+
+library(RColorBrewer)
+library(knitr)
+
+path_recent_input <- "./boot/data/data_from_recent_years/"
+path_data <- "./data/"
+```
+
+# Get data
+
+```{r}
+old <-
+  read.csv(paste0(path_recent_input, "catch_no_sop_year_ctry_1989_2024.csv"))
+names(old)
+unique(old$ctry)
+unique(old$area)
+old <- rename(old, catch_t = catch_1000t)
+old <- subset(old, year >= 2000)
+
+new <- read.csv(paste0(path_data, "22_updated_canum_wbss_nsas_2000-2024.csv"))
+head <- distinct(new, quarter, fleet, subFleet, area, ctry)
+years <- distinct(old, year)
+head_years <- cross_join(head, years)
+new_full <- full_join(new, head_years)
+new_full$catch_t[is.na(new_full$catch_t)] <- 0
+new_full$canum_1000[is.na(new_full$canum_1000)] <- 0
+new <- new_full
+
+unique(new$ctry)
+new$area[new$area %in% c("27.3.c.22", "27.3.d.24")] <- "27.3.c.22, 27.3.d.24"
+new$ctry[new$ctry == "Nedtherlands"] <- "Netherlands"
+
+new_catch_t <- distinct(new, year, quarter, fleet, subFleet, area, ctry, catch_t)
+new_catch_t_sum <- summarise(group_by(new_catch_t, year, ctry, area),
+                             catch_new_t = sum(catch_t, na.rm = T))
+
+new_catch_sop_sum  <- summarise(group_by(new, year, ctry, area),
+                             catch_new_sop = sum(canum_1000 / 1000 * weca_g, na.rm = T))
+
+```
+
+# Overall
+
+```{r}
+old_sum <- summarise(group_by(old, year, area),
+                     catch_t = sum(catch_t * 1000, na.rm = T))
+old_sum$type <- "Present table 3.1.1"
+
+new_catch_t_sum <- summarise(group_by(new_catch_t, year, area),
+                             catch_t = sum(catch_t, na.rm = T))
+new_catch_t_sum$type <- "Updated catch_t"
+
+new_catch_sop_sum  <- summarise(group_by(new, year, area),
+                             catch_t = sum((canum_1000 * weca_g)/1000, na.rm = T))
+new_catch_sop_sum$type <- "Updated sop"
+
+comb_overall <- rbind(old_sum, new_catch_t_sum, new_catch_sop_sum)
+```
+
+```{r}
+
+ggplot(data = comb_overall, aes(x = year, y = catch_t, col = type)) +
+  geom_line() +
+  scale_color_brewer(palette = "Dark2") +
+  facet_grid(~area, scales = "free_y") +
+    theme(legend.position="bottom")
+```
+
+# Per country
+
+```{r}
+
+old_sum <- summarise(group_by(old, year, ctry, area),
+                     catch_t = sum(catch_t * 1000, na.rm = T))
+old_sum$type <- "Present table 3.1.1"
+
+new_catch_t_sum <- summarise(group_by(new_catch_t, year, ctry, area),
+                             catch_t = sum(catch_t, na.rm = T))
+new_catch_t_sum$type <- "Updated catch_t"
+
+new_catch_sop_sum  <- summarise(group_by(new, year, ctry, area),
+                             catch_t = sum((canum_1000 * weca_g)/1000, na.rm = T))
+new_catch_sop_sum$type <- "Updated sop"
+
+comb_overall <- rbind(old_sum, new_catch_t_sum, new_catch_sop_sum)
+
+# wide format for table
+old_sum <- summarise(group_by(old, year, ctry, area),
+                     catch_t_table_3.1.1 = sum(catch_t * 1000, na.rm = T))
+
+new_catch_t_sum <- summarise(group_by(new_catch_t, year, ctry, area),
+                             catch_t_updated = sum(catch_t, na.rm = T))
+
+
+comb_overall_w <- left_join(old_sum, new_catch_t_sum)
+comb_overall_w$diff <- round(comb_overall_w$catch_t_table_3.1.1 - comb_overall_w$catch_t_updated,
+                             digit = 0)
+```
+
+```{r, include = T, results="asis"}
+
+for (i in levels(as.factor(comb_overall$ctry))) {
+  
+  cat(" \n##", i, sep = " ")
+  
+  
+  comb_overall_sub <- subset(comb_overall, ctry == i)
+  
+  p <- ggplot(data = comb_overall_sub, aes(x = year, y = catch_t, col = type)) +
+  geom_line() +
+  scale_color_brewer(palette = "Dark2") +
+  facet_grid(~area, scales = "free_y") +
+    theme(legend.position="bottom")
+  
+  print(p)
+  
+  comb_overall_w_sub <- subset(comb_overall_w, ctry == i)
+  print(kable(subset(comb_overall_w_sub, diff != 0), caption = "Difference > 0"))
+  
+}
+
+```

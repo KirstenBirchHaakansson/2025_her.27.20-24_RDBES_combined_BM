@@ -6,7 +6,8 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, out.width = "150%",
+                      out.height = "200%")
 library(dplyr)
 library(ggplot2)
 
@@ -17,8 +18,17 @@ path_model_input <- "./boot/data/download_from_stockassessment_org_multi_fleet/"
 path_data <- "./data/"
 ```
 
+Here I compare the data from the old spreadsheets, 2000-2015, with the data in the present model.
+
+So CANUM, WECA and split from the spreadsheets
+
+**Summary**
+
+It looks close to perfect in 3a, but in 22-24 there are some minor differences. In Tomas notes I can see that some of these are due to updates, but I have not been able to find the updated spreadsheets.
+
+
 # Get data
-```{r}
+```{r, include = F}
 # Model ----
 cn <- c()
 
@@ -67,16 +77,16 @@ cw_t$stock <- "wbss"
 
 ```
 
-```{r}
+```{r, include = F}
 
-dat_old <- read.csv(paste0(path_data, "canum_old_format_3a.csv") ,sep = ";")
+dat_old <- read.csv(paste0(path_data, "old_canum_with_imputations_2000_2015_IIIa.csv") ,sep = ";")
 
 # Test 
 dat_old_miss <- subset(dat_old, catch_t > 0 & canum %in% c(NA, 0))
 
 sop <- summarise(group_by(dat_old, ctry, year, area, 
               quarter, fleet, catch_t),
-              sop = sum((canum * weca), na.rm = T))
+              sop = sum((canum_1000 * weca_g) / 1000, na.rm = T))
 
 
 dat_old_sop <- left_join(dat_old, sop)
@@ -86,12 +96,12 @@ nrow(subset(dat_old_sop, sopCorr != 1 & catch_t == 0))
 check_sop <- subset(dat_old_sop, sopCorr != 1 & catch_t == 0)
 
 dat_sum <- summarise(group_by(dat_old, year, area, quarter, fleet, wr),
-                     weca_g = sum(weca * canum, na.rm = T) /
-                        sum(canum, na.rm = T),
-                     canum_1000 = sum(canum * 1000, na.rm = T))
+                     weca_g = sum(weca_g * canum_1000, na.rm = T) /
+                        sum(canum_1000, na.rm = T),
+                     canum_1000 = sum(canum_1000, na.rm = T))
 
 
-split <- read.csv(paste0(path_data, "split_old_format_3a.csv") ,sep = ";")
+split <- read.csv(paste0(path_data, "old_split_2000_2015_SD20SD21.csv") ,sep = ";")
 
 splitted <- left_join(dat_sum, split)
 
@@ -124,7 +134,7 @@ nsas$weca_g <- (nsas$caton * 1000 / nsas$canum_1000)
 nsas$stock <- "nsas"
 
 
-dat_2224 <- read.csv(paste0(path_data, "canum_old_format_22-24.csv") ,sep = ";")
+dat_2224 <- read.csv(paste0(path_data, "old_canum_with_imputations_2000_2015_22-24.csv") ,sep = ";")
 wbss_2224 <- summarise(group_by(dat_2224, year, fleet, wr),
                      weca_g = sum(weca_g * canum_1000, na.rm = T) /
                         sum(canum_1000, na.rm = T),
@@ -133,9 +143,10 @@ wbss_2224 <- summarise(group_by(dat_2224, year, fleet, wr),
 wbss_2224$fleet <- "F"
 wbss_2224$stock <- "wbss"
 wbss <- bind_rows(wbss, wbss_2224)
+wbss <- subset(wbss, fleet != "E")
 ```
 
-```{r}
+```{r, include = T}
 comb_w <- left_join(cw_t, wbss)
 comb_w_1 <- left_join(comb_w, cn_t)
 comb_w_1$canum_1000[is.na(comb_w_1$canum_1000)] <- 0
@@ -163,7 +174,8 @@ comb_l <- bind_rows(model, wbss)
 ggplot(data = comb_l, aes(x = year, y = canum_1000, col = type)) +
   geom_line() +
   scale_color_brewer(palette = "Dark2") +
-  facet_grid(wr~fleet, scales = "free_y")
+  facet_grid(wr~fleet, scales = "free_y") +
+    theme(legend.position="bottom")
 
 ```
 
@@ -183,23 +195,16 @@ comb_l$weca_g[comb_l$canum_1000 == 0] <- NA
 ggplot(data = comb_l, aes(x = year, y = weca_g, col = type)) +
   geom_line() +
   scale_color_brewer(palette = "Dark2") +
-  facet_grid(wr~fleet, scales = "free_y") + expand_limits(y = 0)
+  facet_grid(wr~fleet, scales = "free_y") + expand_limits(y = 0) +
+    theme(legend.position="bottom")
 
 ```
 
 ```{r}
 kable(subset(comb_w_1, weca_diff_g != 0 & year < 2016 & !(fleet %in% c("A"))), caption = "Differences")
 
-
 subset(comb_w_1, is.na(weca_g) & !(is.na(weca_g_model)) & year < 2016 & !(fleet %in% c("A")))
 subset(comb_w_1, is.na(weca_g_model) & !(is.na(weca_g)) & year < 2016 & !(fleet %in% c("A")))
 ```
 
-```{r}
-
-ggplot(data = split, aes(x = year, y = wbss)) +
-  geom_line() +
-  facet_grid(wr~area+quarter)
-
-```
 

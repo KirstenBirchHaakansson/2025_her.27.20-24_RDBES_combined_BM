@@ -1,0 +1,127 @@
+---
+title: "compare_updated_model_input_vs_old_model_input"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, out.width = "150%",
+                      out.height = "200%")
+library(dplyr)
+library(ggplot2)
+
+library(RColorBrewer)
+library(knitr)
+
+path_model_input <- "./boot/data/download_from_stockassessment_org_multi_fleet/"
+path_data <- "./data/"
+```
+
+# Get data
+```{r, include = F}
+# Model ----
+cn <- c()
+
+for (i in c("A", "C", "D", "F")) {
+  cn_0 <- read.csv(paste0(path_model_input, "cn_", i, ".dat"),
+                   sep = "",
+                   header = F)
+  year_min <- as.numeric(cn_0[3, 1])
+  year_max <- as.numeric(cn_0[3, 2])
+  cn_0_dat <- cn_0[c(6:((year_max - year_min) + 6)), c(1:9)]
+  names(cn_0_dat) <- c("wr0", "wr1", "wr2", "wr3", "wr4", "wr5", "wr6", "wr7", "wr8+")
+  cn_0_dat$year <- c(year_min:year_max)
+  cn_0_dat$fleet <- i
+  
+  cn <- rbind(cn, cn_0_dat)
+  
+}
+
+cn_t <- tidyr::gather(cn, key = "wr", value = "canum_1000_model", -year, -fleet)
+cn_t$wr <- gsub("wr", "", cn_t$wr)
+cn_t$canum_1000_model <- as.numeric(cn_t$canum_1000_model)
+cn_t$stock <- "wbss"
+
+cw <- c()
+
+for (i in c("A", "C", "D", "F")) {
+  cw_0 <- read.csv(paste0(path_model_input, "cw_", i, ".dat"),
+                   sep = "",
+                   header = F)
+  year_min <- as.numeric(cw_0[3, 1])
+  year_max <- as.numeric(cw_0[3, 2])
+  cw_0_dat <- cw_0[c(6:((year_max - year_min) + 6)), c(1:9)]
+  names(cw_0_dat) <- c("wr0", "wr1", "wr2", "wr3", "wr4", "wr5", "wr6", "wr7", "wr8+")
+  cw_0_dat$year <- c(year_min:year_max)
+  cw_0_dat$fleet <- i
+  
+  cw <- rbind(cw, cw_0_dat)
+  
+}
+
+cw_t <- tidyr::gather(cw, key = "wr", value = "weca_kg_model", -year, -fleet)
+cw_t$wr <- gsub("wr", "", cw_t$wr)
+cw_t$weca_kg_model <- as.numeric(cw_t$weca_kg_model)
+cw_t$weca_g_model <- cw_t$weca_kg_model * 1000
+cw_t$stock <- "wbss"
+
+model <- full_join(cn_t, cw_t)
+
+```
+
+```{r, include = T}
+
+dat <- read.csv(paste0(path_data, "updated_wbss_multi_fleet_2000-2024.csv") ,sep = ",")
+
+wbss <- dat
+wbss$canum_1000 <- wbss$wbss_canum_1000
+wbss$weca_g <- wbss$weca_kg * 1000
+```
+
+```{r, include = T}
+comb_w <- left_join(cw_t, wbss)
+comb_w_1 <- left_join(comb_w, cn_t)
+comb_w_1$canum_1000[is.na(comb_w_1$canum_1000)] <- 0
+comb_w_1$canum_1000_model[is.na(comb_w_1$canum_1000_model)] <- 0
+# comb_w_1$weca_g_model[comb_w_1$canum_1000_model == 0] <- 0
+# comb_w_1$weca_g[comb_w_1$canum_1000 == 0] <- 0
+comb_w_1$canum_diff_no <- round(comb_w_1$canum_1000_model - comb_w_1$canum_1000, digits = 0)
+comb_w_1$weca_diff_g <- round(comb_w_1$weca_g_model - comb_w_1$weca_g, digits = 0)
+comb_w_1 <- select(comb_w_1, -weca_kg_model)
+comb_w_1 <- arrange(comb_w_1, year, fleet, wr)
+
+model <- left_join(cn_t, cw_t)
+model <- rename(model, canum_1000 = canum_1000_model, weca_g = weca_g_model)
+model$type <- "present model input"
+wbss$type <- "Updated model input"
+
+comb_l <- bind_rows(model, wbss)
+ # comb_l$weca_g[comb_l$canum_1000 == 0] <- NA
+```
+
+# Compare canum
+
+```{r}
+
+ggplot(data = comb_l, aes(x = year, y = canum_1000, col = type)) +
+  geom_line() +
+  scale_color_brewer(palette = "Dark2") +
+  facet_grid(wr~fleet, scales = "free_y") +
+    theme(legend.position="bottom")
+
+```
+
+
+# Compare weca
+
+```{r}
+comb_l$weca_g[comb_l$canum_1000 == 0] <- NA
+ggplot(data = comb_l, aes(x = year, y = weca_g, col = type)) +
+  geom_line() +
+  scale_color_brewer(palette = "Dark2") +
+  facet_grid(wr~fleet, scales = "free_y") + expand_limits(y = 0) +
+    theme(legend.position="bottom")
+
+```
+

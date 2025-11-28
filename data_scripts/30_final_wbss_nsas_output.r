@@ -5,8 +5,8 @@ library(dplyr)
 library(tidyr)
 library(readxl)
 
-path_model_input <- "./boot/data/download_from_stockassessment_org_multi_fleet/"
-path_trans_split <- "./boot/data/updated_split_data/"
+path_model_input <- "./boot/initial/data/download_from_stockassessment_org_multi_fleet/"
+path_trans_split <- "./boot/initial/data/updated_split_data/"
 path_data <- "./data/"
 
 # Read in model for fleet A
@@ -115,7 +115,7 @@ canum$nsas_caton[is.na(canum$nsas_caton)] <- 0
 #Output per fleet and area
 ##WBSS
 
-
+#VB: A-fleet missing prior 2022, but I assum area "27.4.a.e" could be manually added
 wbssFinal <-
   aggregate(
     cbind(wbss_canum_1000, wbss_caton) ~ year + wr + fleet + area,
@@ -178,7 +178,7 @@ write.table(
   row.names = F
 )
 
-#Output per fleet
+#Output single fleet
 ##WBSS
 
 wbssFinal <-

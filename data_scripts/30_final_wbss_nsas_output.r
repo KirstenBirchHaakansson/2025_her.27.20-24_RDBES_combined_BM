@@ -79,13 +79,14 @@ for (i in c(2022:2024)) {
   canum_a_updated <- rbind(canum_a_updated, canum_a)
 }
 
-
 canum_a_updated <- rename(canum_a_updated, wbss_canum_1000 = canum_000)
 canum_a_updated$weca_g <- canum_a_updated$weca_kg * 1000
 canum_a_updated$fleet <- "A"
 canum_a_updated$wr <- ifelse(canum_a_updated$wr %in% c("8", "9"), "8+", canum_a_updated$wr)
 
+# Combine fleet A
 unique(canum_a_updated$year)
+
 
 model_a_minus <- subset(model_a, !(year %in% canum_a_updated$year))
 
@@ -116,6 +117,10 @@ canum$nsas_caton[is.na(canum$nsas_caton)] <- 0
 ##WBSS
 
 #VB: A-fleet missing prior 2022, but I assum area "27.4.a.e" could be manually added
+# kibi: 
+# Line 13-60 I read in fleet A from the present model
+# Line 60-85 I read in the update fleet A
+# Line 87-94 I romove years i the update from the model and combine
 wbssFinal <-
   aggregate(
     cbind(wbss_canum_1000, wbss_caton) ~ year + wr + fleet + area,

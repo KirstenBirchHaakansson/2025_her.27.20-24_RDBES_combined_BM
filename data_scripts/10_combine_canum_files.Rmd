@@ -6,8 +6,6 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, out.width = "150%",
-                      out.height = "200%")
 
 library(readxl)
 library(dplyr)
@@ -16,6 +14,17 @@ library(ggplot2)
 options(scipen = 999)
 
 path_data <- "../data/"
+path_fig <- "../report/graphics_from_10/"
+
+dir.create(file.path(path_fig))
+
+
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F, out.width = "150%",
+                      out.height = "200%", fig.path = path_fig)
+
+col <- c("#1170aa", "#fc7d0b", "#a3acb9", "#57606c",
+             "#5fa2ce", "#c85200", "#7b848f", "#a3cce9",
+             "#ffbc79", "#c8d0d9", "#171748")
 ```
 
 # 27.3.a
@@ -103,10 +112,10 @@ nrow(subset(test_sop, sopCorr != 1))
 
 swe_org <- subset(dat_org, ctry == "Sweden")
 swe_org_sum <- summarise(group_by(subset(swe_org, wr == "8+"), year, area), ton = sum(catch_t, na.rm = T))
-swe_org_sum$type <- "present"
+swe_org_sum$type <- "SE - present time series"
 
 swe_new_sum <- summarise(group_by(subset(swe, wr == "8+"), year, area), ton = sum(catch_t, na.rm = T))
-swe_new_sum$type <- "update"
+swe_new_sum$type <- "SE - updated time series"
 
 swe_comb <- bind_rows(swe_org_sum, swe_new_sum)
 
@@ -115,8 +124,9 @@ swe_comb <- bind_rows(swe_org_sum, swe_new_sum)
 ```{r}
 
 ggplot(data = swe_comb, aes(x = year, y = ton, col = type)) +
-  geom_line() +
-  facet_wrap(~area, scales = "free_y") +
-    theme(legend.position="bottom")
+  geom_line(size = 1) +
+  scale_color_manual(values = col) +
+  facet_wrap( ~ area, scales = "free_y") +
+  theme(legend.position = "bottom")
 ```
 

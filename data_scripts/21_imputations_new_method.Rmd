@@ -53,6 +53,7 @@ dat <- left_join(dat, dat_unique)
 dat$subFleet[dat$ctry == "Denmark" &
                dat$fleet == "C"] <- "trawl >= 32mm"
 #VB: to my knowledge none of these countries has PS or GILL in the area so subFleet could be assigned as for DNK
+# Kibi: good point. I will check were samples are coming from in these cases, since they normally don't have any samples
 dat$subFleet[dat$ctry %in% c("Germany",
                              "Lithuania",
                              "Nedtherlands",
@@ -92,6 +93,7 @@ dat$fleet[dat$subFleet == "trawl >= 32mm" &
 dat$fleet[dat$subFleet == "trawl < 32mm" &
             dat$area %in% c("27.3.a.20", "27.3.a.21")] <- "D"
 #VB: just for clarity and generality (in case other areas are included)
+# Kibi: I agree this should not be needed
 ## dat$fleet[!(dat$area %in% c("27.3.a.20", "27.3.a.21"))] <- "F"
 dat$fleet[dat$area %in% c("27.3.b.23","27.3.c.22","27.3.d.24")] <- "F"
 
@@ -550,6 +552,7 @@ dat_imputed <- rbind(dat_imputed_subfleet, dat_imputed_fleet)
 arrange(distinct(dat_without_bio, year, ctry, quarter, area, fleet, subFleet))
 
 #VB: why /9?
+# Kibi: The /9 is because the total catch per stratum is repeated per wr, so it is a lazy way of just getting one of them 
 dat_all <- summarise(group_by(dat, year), t_all = sum(catch_t)/9)
 dat_with_bio_sum <- summarise(group_by(dat_with_bio, year), t_with_bio = sum(catch_t)/9)
 dat_imputed_sum <- summarise(group_by(dat_imputed, year), t_imputed = sum(catch_t)/9)
